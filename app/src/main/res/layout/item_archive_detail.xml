@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/itemEmotionName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="슬픔"
+                android:textStyle="bold"
+                android:textColor="#4A69FF"/>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="8dp"
+                android:background="#DDDDDD"/>
+
+            <TextView
+                android:id="@+id/itemDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2024년 1월 15일"
+                android:textColor="#888888"/>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="극복 방법"
+            android:textSize="12sp"
+            android:textColor="#333333"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/itemOvercome"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="일기를 쓰며 감정을 정리했어요."
+            android:textSize="14sp" />
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
