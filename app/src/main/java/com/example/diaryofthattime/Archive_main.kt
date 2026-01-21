@@ -30,10 +30,9 @@ class Report_main : Fragment(R.layout.archive_emotion){
         super.onViewCreated(view, savedInstanceState)
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerEmotionCards)
-        val txtMost = view.findViewById<TextView>(R.id.txtSummaryMost)
-        val txtLeast = view.findViewById<TextView>(R.id.txtSummaryLeast)
+        val txtSummary = view.findViewById<TextView>(R.id.txtSummaryMost)
 
-        // 1. 5개 감정 더미 데이터 (기획 반영)
+        // 5개 감정 더미 가짜 데이터
         val reportList = listOf(
             EmotionReport("행복", 12, "가족들과 맛있는 저녁을 먹으며 대화하기"),
             EmotionReport("슬픔", 5, "슬픈 영화를 보며 한바탕 울고 푹 자고 일어나기"),
@@ -41,35 +40,35 @@ class Report_main : Fragment(R.layout.archive_emotion){
             EmotionReport("불안", 8, "명상 앱을 켜고 5분간 호흡에 집중하기"),
             EmotionReport("무기력", 2, "작은 화분에 물 주기나 방 청소하기")
         )
-        // 2. 정렬 로직: count(횟수)를 기준으로 내림차순(descending) 정렬
-        val sortedList = reportList.sortedByDescending { it.count }
 
-        // 3. 요약 텍스트 설정
-        if (sortedList.isNotEmpty()) {
-            val mostEmotion = sortedList.first() // 정렬 후 첫 번째가 가장 많음
-            val leastEmotion = sortedList.last() // 정렬 후 마지막이 가장 적음
 
-            txtMost.text = "Most: ${mostEmotion.name} ${mostEmotion.count}회"
-            txtLeast.text = "Least: ${leastEmotion.name} ${leastEmotion.count}회"
+        // "행복" 감정만 추출해서 횟수 표시하기
+        // 만약 리스트에 "행복"이 없을 수도 있으니 find를 사용
+        val happyEmotion = reportList.find { it.name == "행복" }
+
+        if (happyEmotion != null) {
+            // "Happy : 12회" 형식으로 출력
+            txtSummary.text = "Happy : ${happyEmotion.count}회"
         } else {
-            txtMost.text = "Most: - 회"
-            txtLeast.text = "Least: - 회"
+            txtSummary.text = "Happy : - 회"
         }
 
-        // 4. 리사이클러뷰 설정 (정렬된 리스트 사용)
+        // 리사이클러뷰 설정 (정렬된 리스트 사용)
+        // count(횟수)를 기준으로 내림차순(descending) 정렬
+        val sortedList = reportList.sortedByDescending { it.count }
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = EmotionCardAdapter(sortedList) { clickedEmotion ->
 
-            // 1. 상세 화면 프래그먼트 생성
+            // 상세 화면 프래그먼트 생성
             val detailFragment = Archive_detail()
 
-            // 2. 클릭한 감정 이름을 상세 화면으로 전달 (Bundle 사용)
+            // 클릭한 감정 이름을 상세 화면으로 전달 (Bundle 사용)
             val bundle = Bundle().apply {
                 putString("emotionName", clickedEmotion.name)
             }
             detailFragment.arguments = bundle
 
-            // 3. 화면 전환 (MainActivity에서 썼던 replace 로직 활용)
+            // 화면 전환 (MainActivity에서 썼던 replace 로직 활용)
             parentFragmentManager.beginTransaction()
                 .replace(R.id.main, detailFragment)
                 .addToBackStack(null) // 뒤로가기 버튼 누르면 다시 보고서로 돌아옴
@@ -82,7 +81,7 @@ class Report_main : Fragment(R.layout.archive_emotion){
 // 카드뷰 전용 어댑터
 class EmotionCardAdapter(
     private val items: List<EmotionReport>,
-    private val onClick: (EmotionReport) -> Unit // 🔥 클릭 시 실행할 함수를 인자로 받음
+    private val onClick: (EmotionReport) -> Unit // 클릭 시 실행할 함수를 인자로 받음
 ) : RecyclerView.Adapter<EmotionCardAdapter.ViewHolder>() {
 
     class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
@@ -103,7 +102,7 @@ class EmotionCardAdapter(
         holder.count.text = "이번 달 ${data.count}회"
         holder.method.text = data.bestWay
 
-        // 🔥 카드 전체에 클릭 리스너 설정
+        // 카드 전체에 클릭 리스너 설정
         holder.itemView.setOnClickListener {
             onClick(data) // 클릭된 데이터를 밖으로 던져줌
         }

@@ -9,42 +9,28 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="나의 감정 성장 보고서"
+            android:text="나의 감정 성장 보관함"
             android:textSize="22sp"
             android:textStyle="bold"
             android:padding="20dp"
             android:textColor="#1A1A1A"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/txtSummaryMost"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/txtSummaryMost"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:padding="3dp"
-                android:text="Most : -"
-                android:textSize="15dp"/>
-
-            <TextView
-                android:id="@+id/txtSummaryLeast"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:padding="3dp"
-                android:text="Least : -"
-                android:textSize="15dp"/>
-
-        </LinearLayout>
+            android:layout_margin="10dp"
+            android:layout_weight="1"
+            android:padding="3dp"
+            android:text="Happy : -회"
+            android:textAlignment="textEnd"
+            android:textSize="15dp" />
 
     </LinearLayout>
 
