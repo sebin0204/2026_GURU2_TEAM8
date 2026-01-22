@@ -20,4 +20,11 @@ interface DiaryDao {
     // 특정 ID로 일기 하나만 가져오기
     @Query("SELECT * FROM diary_table WHERE id = :id")
     suspend fun getDiaryById(id: Int): Diary
+
+    @Query("""
+        SELECT COUNT(*) FROM diary_table
+        WHERE date BETWEEN :start AND :end
+    """)
+    suspend fun hasDiaryOnDate(start: Long, end: Long): Int
+
 }

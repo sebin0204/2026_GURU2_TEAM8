@@ -27,12 +27,12 @@
         android:textSize="16sp"
         android:layout_marginBottom="20dp" />
 
-    <!-- 월 표시 -->
+    <!-- 월 표시 (텍스트만, 실제 달력은 시스템 날짜 기준) -->
     <TextView
         android:id="@+id/txtMonth"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="1월"
+        android:text="이번 달"
         android:textSize="20sp"
         android:textStyle="bold"
         android:gravity="center"
@@ -48,15 +48,24 @@
         android:padding="16dp"
         android:layout_marginBottom="20dp">
 
-        <!-- 지금은 설명용 텍스트 (나중에 캘린더/리사이클러뷰로 교체) -->
+        <!-- 실제 달력 -->
+        <CalendarView
+            android:id="@+id/calendarView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:showWeekNumber="false"
+            android:firstDayOfWeek="1" />
+
+        <!-- 출석 상태 표시 (나중에 이미지로 교체 예정) -->
         <TextView
-            android:id="@+id/txtAttendanceGuide"
+            android:id="@+id/txtAttendanceStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="감정 아카이브\n\n• 기록한 날 → 출석 표시\n• 기록 안 한 날 → 공백"
-            android:gravity="center"
-            android:textSize="14sp" />
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginBottom="12dp"
+            android:text="날짜를 선택하세요"
+            android:textSize="14sp"
+            android:textStyle="bold" />
     </FrameLayout>
 
     <!-- 감정 기록 버튼 -->

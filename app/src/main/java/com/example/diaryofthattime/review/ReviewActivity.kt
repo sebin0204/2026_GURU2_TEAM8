@@ -15,7 +15,7 @@ class ReviewActivity : AppCompatActivity() {
 
         diaryId = intent.getLongExtra("diaryId", -1)
 
-        findViewById<TextView>(R.id.tvQuestion).text =
-            "지금 이 감정은 정리되었나요?"
+        //findViewById<TextView>(R.id.tvQuestion).text =
+        //    "지금 이 감정은 정리되었나요?"
     }
 }
