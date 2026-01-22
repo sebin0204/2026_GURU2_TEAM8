@@ -1,4 +1,4 @@
-package com.example.diaryofthattime // 본인의 패키지명 확인
+package com.example.diaryofthattime
 
 import android.os.Bundle
 import android.widget.RadioButton
@@ -53,8 +53,12 @@ class WriteActivity : AppCompatActivity() {
         // C. 사실 여부 가져오기 (RadioButton ID: maybetrue 가 체크되었는지 확인)
         val isFact = binding.maybetrue.isChecked
 
-        // D. 저장할 Diary 객체 생성
+        // D. 제목 가져오기(ID : editTextText2)
+        val diaryTitle = binding.editTextText2.text.toString()
+
+        // E. 저장할 Diary 객체 생성
         val newDiary = Diary(
+            title = diaryTitle,
             emotion = emotion,
             reason = reason,
             isFact = isFact,
@@ -62,7 +66,7 @@ class WriteActivity : AppCompatActivity() {
             isReviewed = false
         )
 
-        // E. Room DB에 저장 (비동기 처리)
+        // F. Room DB에 저장 (비동기 처리)
         val db = AppDatabase.getDatabase(applicationContext)
         lifecycleScope.launch(Dispatchers.IO) {
             db.diaryDao().insert(newDiary)
