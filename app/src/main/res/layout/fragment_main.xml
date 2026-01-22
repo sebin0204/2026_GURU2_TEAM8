@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"
+    tools:context="com.example.diaryofthattime.ui.main.MainFragment">
+
+    <!-- 앱 타이틀 -->
+    <TextView
+        android:id="@+id/txtTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="그때의 나"
+        android:textSize="26sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp" />
+
+    <!-- 안내 문구 -->
+    <TextView
+        android:id="@+id/txtSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="오늘의 감정을 기록해보세요"
+        android:textSize="16sp"
+        android:layout_marginBottom="20dp" />
+
+    <!-- 월 표시 -->
+    <TextView
+        android:id="@+id/txtMonth"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="1월"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="12dp" />
+
+    <!-- 출석 / 감정 기록 현황 영역 -->
+    <FrameLayout
+        android:id="@+id/layoutAttendance"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@drawable/bg_attendance_box"
+        android:padding="16dp"
+        android:layout_marginBottom="20dp">
+
+        <!-- 지금은 설명용 텍스트 (나중에 캘린더/리사이클러뷰로 교체) -->
+        <TextView
+            android:id="@+id/txtAttendanceGuide"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="감정 아카이브\n\n• 기록한 날 → 출석 표시\n• 기록 안 한 날 → 공백"
+            android:gravity="center"
+            android:textSize="14sp" />
+    </FrameLayout>
+
+    <!-- 감정 기록 버튼 -->
+    <Button
+        android:id="@+id/btnWriteEmotion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="감정 기록하기" />
+
+    <!-- 감정 보관함 버튼 -->
+    <Button
+        android:id="@+id/btnArchive"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="감정 보관함"
+        android:layout_marginTop="8dp" />
+
+</LinearLayout>
