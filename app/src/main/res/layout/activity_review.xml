@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp">
+
+        <LinearLayout
+            android:id="@+id/layoutPastDiary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:drawable/editbox_background"
+            android:orientation="vertical"
+            android:padding="16dp"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/textPastDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2026년 01월 13일의 기록"
+                android:textColor="#888888" />
+
+            <TextView
+                android:id="@+id/textPastTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="과거 일기 제목"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/textPastEmotion"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="기분: 슬픔"
+                android:textColor="#FF5722" />
+
+            <TextView
+                android:id="@+id/textPastReason"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="과거에 썼던 구체적인 이유가 여기에 나옵니다." />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textQuestion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="이 감정을 극복하셨나요?"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layoutPastDiary" />
+
+        <LinearLayout
+            android:id="@+id/layoutButtons"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textQuestion">
+
+            <Button
+                android:id="@+id/btnOvercomeYes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:text="네, 극복했어요!" />
+
+            <Button
+                android:id="@+id/btnOvercomeNo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#888888"
+                android:text="아직 못했어요" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layoutOvercomeInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:orientation="vertical"
+            android:visibility="visible"
+            app:layout_constraintTop_toBottomOf="@id/layoutButtons"
+            tools:visibility="visible">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="그때 느낀 감정은 사실이었나요?"
+                android:textColor="#000000"
+                android:textStyle="bold" />
+
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/rbStillFact"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="사실" />
+
+                <RadioButton
+                    android:id="@+id/rbNotFact"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="추측" />
+            </RadioGroup>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="나만의 감정 극복 방법"
+                android:textColor="#000000"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/editOvercomeWay"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:background="@android:drawable/editbox_background"
+                android:gravity="top"
+                android:hint="어떻게 이겨냈는지 궁금해요!"
+                android:padding="8dp"
+                android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="미래의 나(혹은 과거의 나)에게 한마디"
+                android:textColor="#000000"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/editMessageToMe"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:background="@android:drawable/editbox_background"
+                android:gravity="top"
+                android:hint="해당 감정이 또 나타날 수 있어요. \n언제든 볼 수 있게 따뜻한 한마디를 남겨주세요."
+                android:padding="8dp"
+                android:textSize="12sp" />
+
+            <Button
+                android:id="@+id/btnSaveReview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:backgroundTint="#D32F2F"
+                android:text="회고 완료" />
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
