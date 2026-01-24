@@ -54,4 +54,15 @@
         android:padding="16dp"
         android:clipToPadding="false"/>
 
+    <TextView
+        android:id="@+id/txtNoData"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        android:gravity="center"
+        android:text="이번 달은 아직 기록이 없어요!\n나의 감정을 기록해보세요.✨"
+        android:textColor="#9E9E9E"
+        android:textSize="16sp"
+        android:visibility="gone" />
+
 </LinearLayout>
