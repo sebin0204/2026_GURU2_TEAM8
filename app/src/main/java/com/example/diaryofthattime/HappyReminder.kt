@@ -52,8 +52,7 @@ class HappyReminderWorker(context: Context, params: WorkerParameters) : Worker(c
             notificationManager.createNotificationChannel(channel)
         }
 
-        // 알림 클릭 시 실행될 Intent 설정
-        // 알림 클릭 시 앱의 메인 화면으로 이동하며 정보를 전달합니다.
+        // 알림 클릭 시 실행될 Intent 설정 : 앱의 메인 화면으로 이동하며 정보를 전달합니다.
         val intent = Intent(applicationContext, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             putExtra("SHOW_HAPPY_POPUP", true)
