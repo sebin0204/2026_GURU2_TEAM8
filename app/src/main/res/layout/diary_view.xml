@@ -8,7 +8,8 @@
     <FrameLayout
         android:id="@+id/topBar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="60dp"
+        android:layout_marginTop="20dp"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageButton
@@ -18,33 +19,46 @@
             android:layout_gravity="center_vertical|start"
             android:layout_marginStart="8dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_media_previous" />
+            android:src="@drawable/baseline_arrow_back_24" />
 
-        <ImageButton
-            android:id="@+id/btnEdit"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_gravity="center_vertical|end"
-            android:layout_marginEnd="56dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_menu_edit"
-            app:tint="#4A69FF" />
+        <TextView
+            android:id="@+id/viewDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="2026년 01월 24일"
+            android:textColor="#9E9E9E"
+            android:textSize="14sp" />
 
-        <ImageButton
-            android:id="@+id/btnDelete"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|end"
             android:layout_marginEnd="8dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_menu_delete"
-            app:tint="#FF5252" />
+            android:orientation="horizontal">
 
+            <ImageButton
+                android:id="@+id/btnEdit"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@android:drawable/ic_menu_edit"
+                app:tint="#4A69FF" />
+
+            <ImageButton
+                android:id="@+id/btnDelete"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@android:drawable/ic_menu_delete"
+                app:tint="#FF5252" />
+        </LinearLayout>
     </FrameLayout>
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginTop="5dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/topBar">
 
@@ -52,96 +66,123 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="24dp">
+            android:padding="16dp">
 
-            <TextView
-                android:id="@+id/viewEmotion"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:paddingHorizontal="20dp"
-                android:paddingVertical="6dp"
-                android:text="행복"
-                android:textColor="#000000"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
-            <TextView
-                android:id="@+id/viewDate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="12dp"
-                android:text="2026년 01월 24일"
-                android:textColor="#9E9E9E"
-                android:textSize="14sp" />
+                <ImageView
+                    android:id="@+id/imgEmotion"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:src="@android:drawable/btn_star_big_on" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="10dp"
+                    android:layout_gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/viewTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="일기 제목"
+                        android:textColor="#212121"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/viewMessage"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="나에게 전하는 따뜻한 한마디"
+                        android:textColor="#90A4AE"
+                        android:textSize="13sp"
+                        android:textStyle="italic" />
+                </LinearLayout>
+            </LinearLayout>
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginVertical="24dp"
+                android:layout_marginVertical="18dp"
                 android:background="#F0F0F0" />
-
-            <TextView
-                android:id="@+id/viewTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="일기 제목"
-                android:textColor="#212121"
-                android:textSize="22sp"
-                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/viewContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:minHeight="350dp"
+
+                android:layout_marginHorizontal="10dp"
+                android:padding="15dp"
+                android:background="#FAFAFA"
                 android:lineSpacingExtra="8dp"
                 android:text="일기 내용이 출력되는 부분입니다."
                 android:textColor="#424242"
                 android:textSize="17sp" />
 
-            <LinearLayout
-                android:id="@+id/overcomeLayout"
+            <View
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="40dp"
-                android:background="#F8F9FA"
-                android:orientation="vertical"
-                android:padding="20dp">
+                android:layout_height="1dp"
+                android:layout_marginVertical="18dp"
+                android:background="#F0F0F0" />
 
-                <TextView
-                    android:id="@+id/labelOvercome"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="💡 나의 생각 정리"
-                    android:textColor="#607D8B"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-                <TextView
-                    android:id="@+id/viewOvercome"
+                <LinearLayout
+                    android:id="@+id/overcomeLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="이겨낸 방법 또는 기록이 표시됩니다."
-                    android:textColor="#263238"
-                    android:textSize="15sp" />
-            </LinearLayout>
+                    android:layout_marginHorizontal="10dp"
+                    android:background="#F8F9FA"
+                    android:orientation="vertical"
+                    android:padding="20dp">
 
-            <TextView
-                android:id="@+id/viewMessage"
+                    <TextView
+                        android:id="@+id/labelOvercome"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="💡 극복 방법"
+                        android:textColor="#607D8B"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/viewOvercome"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="이겨낸 방법 또는 기록이 표시됩니다."
+                        android:textColor="#263238"
+                        android:textSize="15sp" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/stampImage"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_gravity="end|bottom"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginBottom="10dp"
+                    android:alpha="0.7"
+                    android:rotation="-15"
+                    android:visibility="gone"
+                    android:src="@drawable/ic_launcher_foreground" />
+            </FrameLayout>
+
+            <View
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="40dp"
-
-                android:gravity="center"
-                android:padding="20dp"
-                android:text="나에게 전하는 따뜻한 한마디"
-                android:textColor="#78909C"
-                android:textSize="15sp"
-                android:textStyle="italic" />
+                android:layout_height="50dp" />
 
         </LinearLayout>
     </ScrollView>

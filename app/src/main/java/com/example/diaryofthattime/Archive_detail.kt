@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -184,7 +185,7 @@ class DiaryViewFragment : Fragment(R.layout.diary_view) {
         val btnDelete = view.findViewById<ImageButton>(R.id.btnDelete)
         val txtTitle = view.findViewById<TextView>(R.id.viewTitle)
         val txtDate = view.findViewById<TextView>(R.id.viewDate)
-        val txtEmotion = view.findViewById<TextView>(R.id.viewEmotion)
+        val imgEmotion = view.findViewById<ImageView>(R.id.imgEmotion)
         val txtContent = view.findViewById<TextView>(R.id.viewContent)
         val txtMessage = view.findViewById<TextView>(R.id.viewMessage)
         val overcomeLayout = view.findViewById<View>(R.id.overcomeLayout)
@@ -255,8 +256,11 @@ class DiaryViewFragment : Fragment(R.layout.diary_view) {
                 txtDate.text =
                     SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREA).format(Date(diary.date))
                 txtContent.text = diary.reason
-                txtEmotion.text = diary.emotion
                 txtMessage.text = diary.messageToMe ?: "나에게 남긴 메시지가 없습니다."
+
+                // [추가] 감정 텍스트를 이미지 리소스로 변환하여 적용
+                val emotionResId = getEmotionImage(diary.emotion)
+                imgEmotion.setImageResource(emotionResId)
 
                 // [조건부 표시] overcomeWay가 있을 때만 레이아웃을 보여줌
                 if (!diary.overcomeWay.isNullOrBlank()) {
@@ -274,6 +278,17 @@ class DiaryViewFragment : Fragment(R.layout.diary_view) {
                     .show()
                 parentFragmentManager.popBackStack() // 에러 발생 시 리스트로 튕겨내기
             }
+        }
+    }
+    // [추가] 감정 이름에 맞는 이미지 리소스를 반환하는 함수
+    private fun getEmotionImage(emotion: String?): Int {
+        return when (emotion) {
+            "행복" -> R.drawable.ic_launcher_foreground   // 실제 이미지 파일명으로 수정하세요
+            "무기력" -> R.drawable.ic_launcher_foreground
+            "슬픔" -> R.drawable.ic_launcher_foreground
+            "분노" -> R.drawable.ic_launcher_foreground
+            "불안" -> R.drawable.ic_launcher_foreground
+            else -> R.drawable.ic_launcher_foreground // 기본 이미지
         }
     }
 }
