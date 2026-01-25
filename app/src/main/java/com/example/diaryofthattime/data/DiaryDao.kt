@@ -66,5 +66,9 @@ interface DiaryDao {
           AND strftime('%m', date) = :month
     """)
     fun getDiariesByMonth(year: String, month: String): Flow<List<Diary>>
+
+    //행복한 감정만 가져오기
+    @Query("SELECT * FROM diary_table WHERE emotion = '행복'")
+    fun getHappyDiariesSync(): List<Diary>
 }
 
