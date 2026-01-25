@@ -9,32 +9,35 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import com.example.diaryofthattime.data.AppDatabase
 
 class HappyReminderWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
 
     override fun doWork(): Result {
+        val db = AppDatabase.getDatabase(applicationContext)
 
-        // 가짜 데이터(더미)
-        val allHappyMemories = listOf(
-            "정말 즐거웠던 산책",
-            "맛있는 점심 식사",
-            "친구와의 깜짝 만남",
-            "햇살 좋은 오후",
-            "작은 화분에 물 주기"
-        )
+        // DB에서 '행복' 감정인 일기들만 가져오기 (Dao에 쿼리가 없다면 아래처럼 코루틴 활용)
+        // 여기서는 간단히 모든 일기를 가져와 필터링하는 예시입니다.
+        // 더 효율적으로 하려면 Dao에 getHappyDiaries()를 만드셔도 좋습니다.
 
-        if (allHappyMemories.isNotEmpty()) {
-            // 전체 데이터 중 하나를 랜덤으로 뽑습니다.
-            val randomMemory = allHappyMemories.random()
+        var result: Result = Result.success()
 
-            // 휴대폰 알림창으로 보냅니다.
-            sendNotification(randomMemory)
+        // Worker는 CoroutineScope가 아니므로 runBlocking을 쓰거나 로직을 잘 구성해야 합니다.
+        // 하지만 가장 권장되는 방식은 ListenableWorker를 쓰는 것이나,
+        // 여기선 간단하게 구현하겠습니다.
+
+        val happyDiaries = db.diaryDao().getHappyDiariesSync() // (아래 Dao 설명 참고)
+
+        if (!happyDiaries.isNullOrEmpty()) {
+            val randomDiary = happyDiaries.random()
+            // 알림에 ID와 제목을 함께 보냅니다.
+            sendNotification(randomDiary.id, randomDiary.title)
         }
 
         return Result.success()
     }
 
-    private fun sendNotification(message: String) {
+    private fun sendNotification(diaryId: Int, title: String) {
         val channelId = "HAPPY_CHANNEL_V2"
         val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
@@ -56,7 +59,8 @@ class HappyReminderWorker(context: Context, params: WorkerParameters) : Worker(c
         val intent = Intent(applicationContext, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             putExtra("SHOW_HAPPY_POPUP", true)
-            putExtra("HAPPY_CONTENT", message)
+            putExtra("HAPPY_CONTENT", title)
+            putExtra("DIARY_ID", diaryId) // 일기 ID를 택배에 넣습니다.
         }
 
         val pendingIntent = PendingIntent.getActivity(
@@ -68,7 +72,7 @@ class HappyReminderWorker(context: Context, params: WorkerParameters) : Worker(c
         val builder = NotificationCompat.Builder(applicationContext, channelId)
             .setSmallIcon(R.drawable.ic_launcher_foreground) // 폰 상단 바에 뜰 아이콘
             .setContentTitle("🌟 잊고 있던 행복한 기억") // 알림 제목
-            .setContentText("\"$message\" 기억나시나요?") // 알림 내용
+            .setContentText("\"$title\" 기억나시나요?") // 제목 노출
             .setPriority(NotificationCompat.PRIORITY_HIGH) // 배너(Heads-up) 알림을 위한 설정
             .setDefaults(NotificationCompat.DEFAULT_ALL)   // 진동, 소리 기본값 사용
             .setContentIntent(pendingIntent)

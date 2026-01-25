@@ -45,7 +45,8 @@ override fun onResume() {
     // 알림을 눌러서 들어왔는지 확인 후 팝업 띄우기
     if (intent.getBooleanExtra("SHOW_HAPPY_POPUP", false)) {
         val content = intent.getStringExtra("HAPPY_CONTENT") ?: ""
-        showHappyPopup(content)
+        val diaryId = intent.getIntExtra("DIARY_ID", -1) // ID 꺼내기
+        showHappyPopup(content, diaryId)
 
         // 팝업을 한 번 띄웠으므로 데이터를 지워줍니다 (중복 방지)
         intent.removeExtra("SHOW_HAPPY_POPUP")
@@ -71,12 +72,27 @@ private fun scheduleRandomHappyNotification() {
 }
 
 // 팝업 클릭하면 나타나는 메시지 -> 그날 일기 페이지로 연결할 때 삭제
-private fun showHappyPopup(content: String) {
+private fun showHappyPopup(content: String, diaryId: Int) {
     // AlertDialog 임포트 시 androidx.appcompat.app.AlertDialog 선택
     AlertDialog.Builder(this)
         .setTitle("🌟 다시 보는 행복")
         .setMessage("[$content]\n\n이때의 행복한 마음을 다시 느껴보세요!")
-        .setPositiveButton("확인", null)
+        .setPositiveButton("내용 보기") { _, _ ->
+            // 상세 페이지(DiaryViewFragment)로 이동
+            if (diaryId != -1) {
+                val detailFragment = DiaryViewFragment().apply {
+                    arguments = Bundle().apply {
+                        putInt("diaryId", diaryId)
+                    }
+                }
+
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.main, detailFragment)
+                    .addToBackStack(null)
+                    .commit()
+            }
+        }
+        .setNegativeButton("닫기", null)
         .show()
 }
 }
