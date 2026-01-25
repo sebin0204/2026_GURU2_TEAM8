@@ -8,7 +8,7 @@ import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.diaryofthattime.R
-import com.example.diaryofthattime.ReviewActivity // 패키지 경로 확인 필수
+import com.example.diaryofthattime.review.ReviewActivity// 패키지 경로 확인 필수
 
 class ReviewAlarmReceiver : BroadcastReceiver() {
 
@@ -21,7 +21,7 @@ class ReviewAlarmReceiver : BroadcastReceiver() {
 
         // 2. 알림 클릭 시 실행될 Intent 설정 (ReviewActivity로 이동)
         val notificationIntent = Intent(context, ReviewActivity::class.java).apply {
-            putExtra("DIARY_ID", diaryId.toInt()) // ReviewActivity에서 쓰는 키값과 통일
+            putExtra("diaryId", diaryId.toInt()) // ReviewActivity에서 쓰는 키값과 통일
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
 
