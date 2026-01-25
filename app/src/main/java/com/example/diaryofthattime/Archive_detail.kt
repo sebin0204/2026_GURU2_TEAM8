@@ -172,7 +172,7 @@ class Archive_detail : Fragment(R.layout.archive_emotion_detail) {
     }
 
 }
-    //
+    //일기 확인 로직
 class DiaryViewFragment : Fragment(R.layout.diary_view) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -197,12 +197,12 @@ class DiaryViewFragment : Fragment(R.layout.diary_view) {
         btnEdit.setOnClickListener {
             // WriteActivity가 작성과 수정을 같이 한다고 가정할 때
             val intent = Intent(requireContext(), WriteActivity::class.java).apply {
-                // 2. 택배 상자(Intent)에 데이터 담기
+                // 택배 상자(Intent)에 데이터 담기
                 putExtra("diaryId", diaryId)      // 수정할 일기의 고유 ID
                 putExtra("isEditMode", true)     // 수정 모드임을 알리는 신호
             }
 
-            // 3. 액티비티 실행
+            // 액티비티 실행
             startActivity(intent)
 
             // 안내 메시지
@@ -268,7 +268,7 @@ class DiaryViewFragment : Fragment(R.layout.diary_view) {
                     overcomeLayout.visibility = View.GONE
                 }
             } catch (e: Exception) {
-                // 🛠️ 에러 처리: 로그를 남기고 사용자에게 알림
+                // 에러 처리: 로그를 남기고 사용자에게 알림
                 Log.e("DiaryView", "Error loading diary data", e)
                 Toast.makeText(requireContext(), "데이터 로드 중 오류가 발생했습니다.", Toast.LENGTH_SHORT)
                     .show()

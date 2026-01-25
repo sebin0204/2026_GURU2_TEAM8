@@ -46,14 +46,14 @@ class Archive_main : Fragment(R.layout.archive_emotion){
         val btnNext = view.findViewById<ImageButton>(R.id.btnNextMonth)
 
         updateUI(txtDate, txtSummary, recyclerView)
-
+        //이전달
         btnPrev.setOnClickListener {
             if (currentMonth > 1) currentMonth-- else {
                 currentMonth = 12; currentYear--
             }
             updateUI(txtDate, txtSummary, recyclerView)
         }
-
+        //이번달
         btnNext.setOnClickListener {
             if (currentMonth < 12) currentMonth++ else {
                 currentMonth = 1; currentYear++
@@ -90,11 +90,11 @@ class Archive_main : Fragment(R.layout.archive_emotion){
                     )
                 }
 
-                // 4. 상단 행복 횟수 고정 표시
+                // 상단 행복 횟수 고정 표시
                 val happyCount = reportList.find { it.name == "행복" }?.count ?: 0
-                txtSummary.text = "행복 : ${if(happyCount > 0) "${happyCount}회" else "-회"}"
+                txtSummary.text = "행복 : ${if(happyCount > 0) "${happyCount}회" else "- 회"}"
 
-                // 5. 리사이클러뷰 연결
+                // 리사이클러뷰 연결
                 rv.layoutManager = LinearLayoutManager(requireContext())
                 rv.adapter = EmotionCardAdapter(reportList) { clicked ->
                     val detailFragment = Archive_detail().apply {
@@ -111,7 +111,7 @@ class Archive_main : Fragment(R.layout.archive_emotion){
 // 카드뷰 전용 어댑터
 class EmotionCardAdapter(
     private val items: List<EmotionReport>,
-    private val onClick: (EmotionReport) -> Unit // 클릭 시 실행할 함수를 인자로 받음
+    private val onClick: (EmotionReport) -> Unit
 ) : RecyclerView.Adapter<EmotionCardAdapter.ViewHolder>() {
 
     class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
@@ -136,7 +136,7 @@ class EmotionCardAdapter(
 
         // 카드 전체에 클릭 리스너 설정
         holder.itemView.setOnClickListener {
-            onClick(data) // 클릭된 데이터를 밖으로 던져줌
+            onClick(data)
         }
     }
 
