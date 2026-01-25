@@ -21,7 +21,7 @@ class ReviewAlarmReceiver : BroadcastReceiver() {
 
         // 2. 알림 클릭 시 실행될 Intent 설정 (ReviewActivity로 이동)
         val notificationIntent = Intent(context, ReviewActivity::class.java).apply {
-            putExtra("diaryId", diaryId.toInt()) // ReviewActivity에서 쓰는 키값과 통일
+            putExtra("diaryId", diaryId) // ReviewActivity에서 쓰는 키값과 통일
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
 

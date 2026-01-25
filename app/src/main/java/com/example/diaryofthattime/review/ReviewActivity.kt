@@ -37,7 +37,7 @@ class ReviewActivity : AppCompatActivity() {
             AlarmHelper.scheduleReviewAlarm(
                 context = this,
                 diaryId = diaryId,
-                createdAt = 7 * 24 * 60 * 60 * 1000L
+                createdAt = System.currentTimeMillis()
             )
             finish()
 
