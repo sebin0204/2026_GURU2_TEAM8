@@ -39,7 +39,7 @@ class Archive_main : Fragment(R.layout.archive_emotion){
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerEmotionCards)
         val txtSummary = view.findViewById<TextView>(R.id.txtSummaryMost)
-        val txtDate = view.findViewById<TextView>(R.id.txtCurrentMonth)
+        val txtDate = view.findViewById<TextView>(R.id.txtCurrentDate)
 
         // 날짜 이동 버튼
         val btnPrev = view.findViewById<ImageButton>(R.id.btnPrevMonth)
