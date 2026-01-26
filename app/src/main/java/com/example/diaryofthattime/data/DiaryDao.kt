@@ -16,8 +16,6 @@ interface DiaryDao {
     @Update
     suspend fun update(diary: Diary)
 
-    @Query("SELECT * FROM diary_table WHERE id = :id")
-    suspend fun getDiaryById(id: Int): Diary
 
     @Delete
     suspend fun delete(diary: Diary)
@@ -60,4 +58,15 @@ interface DiaryDao {
     // 6. 행복한 감정만 가져오기 (테스트용)
     @Query("SELECT * FROM diary_table WHERE emotion = '행복'")
     fun getHappyDiariesSync(): List<Diary>
+
+    // com.example.diaryofthattime.data.DiaryDao.kt
+    @Query("SELECT * FROM diary_table WHERE date BETWEEN :start AND :end LIMIT 1")
+    suspend fun getDiaryByDateRange(start: Long, end: Long): Diary?
+
+    @Query("SELECT * FROM diary_table WHERE id = :id")
+    suspend fun getDiaryById(id: Int): Diary?
+
+    // com.example.diaryofthattime.data.DiaryDao.kt
+    @Query("SELECT * FROM diary_table ORDER BY date DESC")
+    fun getAllDiariesSync(): List<Diary> // 모든 일기를 리스트로 가져오는 함수
 }
