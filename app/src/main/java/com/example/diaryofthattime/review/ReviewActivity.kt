@@ -18,6 +18,8 @@ class ReviewActivity : AppCompatActivity() {
         diaryId = intent.getLongExtra("diaryId", -1)
         if (diaryId == -1L) finish()
 
+        //findViewById<TextView>(R.id.tvQuestion).text =
+        //    "지금 이 감정은 정리되었나요?"
         val tvQuestion = findViewById<TextView>(R.id.tvQuestion)
         tvQuestion.text = "지금 이 감정은 정리되었나요?"
 

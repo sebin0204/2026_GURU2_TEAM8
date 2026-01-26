@@ -22,6 +22,13 @@ interface DiaryDao {
     @Query("SELECT * FROM diary_table WHERE id = :id")
     suspend fun getDiaryById(id: Int): Diary
 
+    @Query("""
+        SELECT COUNT(*) FROM diary_table
+        WHERE date BETWEEN :start AND :end
+    """)
+    suspend fun hasDiaryOnDate(start: Long, end: Long): Int
+
+}
     /**
      * 1. 메인 보고서용: 감정별 횟수 통계
      * 그룹화(GROUP BY)를 통해 각 감정이 몇 번 기록되었는지 계산합니다.
