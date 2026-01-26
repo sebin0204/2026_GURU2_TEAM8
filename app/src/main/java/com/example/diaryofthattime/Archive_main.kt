@@ -44,6 +44,9 @@ class Archive_main : Fragment(R.layout.archive_emotion){
         // 날짜 이동 버튼
         val btnPrev = view.findViewById<ImageButton>(R.id.btnPrevMonth)
         val btnNext = view.findViewById<ImageButton>(R.id.btnNextMonth)
+        val btnBack = view.findViewById<ImageButton>(R.id.btnBack)
+
+        btnBack.setOnClickListener { parentFragmentManager.popBackStack() }
 
         updateUI(txtDate, txtSummary, recyclerView)
         //이전달
@@ -96,12 +99,20 @@ class Archive_main : Fragment(R.layout.archive_emotion){
 
                 // 리사이클러뷰 연결
                 rv.layoutManager = LinearLayoutManager(requireContext())
+                // 어댑터 클릭 리스너 내부에 날짜 데이터 전달 로직 추가
                 rv.adapter = EmotionCardAdapter(reportList) { clicked ->
                     val detailFragment = Archive_detail().apply {
-                        arguments = Bundle().apply { putString("emotionName", clicked.name) }
+                        arguments = Bundle().apply {
+                            putString("emotionName", clicked.name)
+                            // 핵심 수정: 현재 메인 화면의 연도와 월을 Bundle에 담아 전달합니다.
+                            putInt("selectedYear", currentYear)
+                            putInt("selectedMonth", currentMonth)
+                        }
                     }
                     parentFragmentManager.beginTransaction()
-                        .replace(R.id.main, detailFragment).addToBackStack(null).commit()
+                        .replace(R.id.main, detailFragment)
+                        .addToBackStack(null)
+                        .commit()
                 }
             }
         }

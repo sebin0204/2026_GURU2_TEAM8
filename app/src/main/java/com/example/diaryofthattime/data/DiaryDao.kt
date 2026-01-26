@@ -60,8 +60,8 @@ interface DiaryDao {
     fun getHappyDiariesSync(): List<Diary>
 
     // com.example.diaryofthattime.data.DiaryDao.kt
-    @Query("SELECT * FROM diary_table WHERE date BETWEEN :start AND :end LIMIT 1")
-    suspend fun getDiaryByDateRange(start: Long, end: Long): Diary?
+    @Query("SELECT * FROM diary_table WHERE date BETWEEN :start AND :end")
+    suspend fun getDiaryByDateRange(start: Long, end: Long): List<Diary>
 
     @Query("SELECT * FROM diary_table WHERE id = :id")
     suspend fun getDiaryById(id: Int): Diary?

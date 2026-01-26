@@ -4,14 +4,17 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.diaryofthattime.Archive_main
 import com.example.diaryofthattime.DiaryDetailActivity // 상세 페이지 import 추가
+import com.example.diaryofthattime.DiaryViewFragment
 import com.example.diaryofthattime.R
 import com.example.diaryofthattime.ReviewActivity
 import com.example.diaryofthattime.WriteActivity
 import com.example.diaryofthattime.data.AppDatabase
+import com.example.diaryofthattime.data.Diary
 import com.example.diaryofthattime.databinding.FragmentMainBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -22,11 +25,12 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
     private var _binding: FragmentMainBinding? = null
     private val binding get() = _binding!!
+    private var lastClickedTime: Long = 0
+    private var lastClickedDate: String = ""
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentMainBinding.bind(view)
-
 
         // 달력 잔상을 막기 위해 현재 시간으로 명시적 설정
         binding.calendarView.date = System.currentTimeMillis()
@@ -51,6 +55,8 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         val diaryDao = AppDatabase.getDatabase(requireContext()).diaryDao()
 
         binding.calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
+            val currentTime = System.currentTimeMillis()
+            val selectedDate = "$year-$month-$dayOfMonth"
 
             val calendar = Calendar.getInstance().apply {
                 set(year, month, dayOfMonth, 0, 0, 0)
@@ -64,19 +70,30 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
             lifecycleScope.launch(Dispatchers.IO) {
                 // 해당 날짜의 일기 객체를 직접 가져옵니다.
-                val diary = diaryDao.getDiaryByDateRange(startOfDay, endOfDay)
+                val diaryList: List<Diary> = diaryDao.getDiaryByDateRange(startOfDay, endOfDay)
 
                 withContext(Dispatchers.Main) {
-                    if (diary != null) {
+                    if (diaryList.isNotEmpty()) {
                         binding.txtAttendanceStatus.text = "출석 완료 ✔"
 
-                        // ★ 일기가 있는 날짜를 클릭하면 상세 페이지로 이동 ★
-                        val intent = Intent(requireContext(), DiaryDetailActivity::class.java)
-                        intent.putExtra("DIARY_ID", diary.id) // DiaryDetailActivity에서 받을 키값
-                        startActivity(intent)
+                        // ★ 일기가 있는 날짜를 더블 클릭하면 상세 페이지로 이동 ★
+                        if (currentTime - lastClickedTime < 300 && lastClickedDate == selectedDate) {
+
+                            if (diaryList.size > 1) {
+                                // 일기가 여러 개일 때는 목록 팝업 띄우기
+                                showDiaryListDialog(diaryList, month, dayOfMonth)
+
+                            } else {
+                                // 일기가 하나일 때는 바로 이동 여부 묻기
+                                showSingleDiaryDialog(diaryList[0], month, dayOfMonth)
+                            }
+                        }
                     } else {
                         binding.txtAttendanceStatus.text = "아직 기록이 없어요"
                     }
+                    // 마지막 클릭 정보 업데이트
+                    lastClickedTime = currentTime
+                    lastClickedDate = selectedDate
                 }
             }
         }
@@ -106,6 +123,48 @@ class MainFragment : Fragment(R.layout.fragment_main) {
             .setMessage(recommendation)
             .setPositiveButton("확인", null)
             .show()
+    }
+
+    //일기가 여러 개일 때 선택 목록을 보여주는 다이얼로그
+    private fun showDiaryListDialog(diaryList: List<Diary>, month: Int, dayOfMonth: Int) {
+        // 다이얼로그에 표시할 제목 리스트 생성 (내용의 일부나 시간을 표시)
+        val items = diaryList.mapIndexed { index, diary ->
+            "${index + 1}. ${diary.title}"
+        }.toTypedArray()
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("${month + 1}월 ${dayOfMonth}일의 일기 목록")
+            .setItems(items) { _, which ->
+                // 선택한 순번에 해당하는 일기 ID 전달
+                navigateToDetail(diaryList[which].id)
+            }
+            .setNegativeButton("취소", null)
+            .show()
+    }
+
+    //일기가 하나일 때 기존처럼 이동 여부를 묻는 다이얼로그
+    private fun showSingleDiaryDialog(diary: Diary, month: Int, dayOfMonth: Int) {
+        AlertDialog.Builder(requireContext())
+            .setTitle("일기 확인")
+            .setMessage("${month + 1}월 ${dayOfMonth}일의 일기로 이동하시겠습니까?")
+            .setPositiveButton("이동") { _, _ ->
+                navigateToDetail(diary.id)
+            }
+            .setNegativeButton("취소", null)
+            .show()
+    }
+
+    //상세 페이지로 Fragment 교체 및 ID 전달 공통 함수
+    private fun navigateToDetail(diaryId: Int) {
+        val fragment = DiaryViewFragment().apply {
+            arguments = Bundle().apply {
+                putInt("diaryId", diaryId)
+            }
+        }
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.main, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 
     override fun onDestroyView() {

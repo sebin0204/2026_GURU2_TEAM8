@@ -13,7 +13,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:padding="20dp"
+        android:background="#FDFBF7">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -29,17 +30,17 @@
                 android:text="슬픔"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                android:textColor="#333333"/>
+                android:textColor="#3E3429"/>
 
             <TextView
                 android:id="@+id/txtEmotionCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="#F0F0F0"
+                android:background="@drawable/bg_count_tag"
                 android:paddingHorizontal="10dp"
                 android:paddingVertical="4dp"
                 android:text="이번 달 5회"
-                android:textColor="#666666"
+                android:textColor="#9B7F61"
                 android:textSize="12sp" />
         </LinearLayout>
 
@@ -47,14 +48,14 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginVertical="12dp"
-            android:background="#EEEEEE" />
+            android:background="#E6DCCB" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="최근 극복 방법"
             android:textSize="12sp"
-            android:textColor="#4A69FF"
+            android:textColor="#2A52BE"
             android:textStyle="bold" />
 
         <TextView
@@ -64,7 +65,7 @@
             android:layout_marginTop="4dp"
             android:text="따뜻한 차를 마시며 좋아하는 음악을 들었어요."
             android:textSize="14sp"
-            android:textColor="#555555"
+            android:textColor="#3E3429"
             android:lineSpacingExtra="4dp" />
 
     </LinearLayout>

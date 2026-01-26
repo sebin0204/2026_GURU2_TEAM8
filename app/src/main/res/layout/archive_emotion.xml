@@ -5,15 +5,23 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#F8F9FA"
+    android:background="#EDE2D0"
     android:clickable="true"   android:focusable="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="8dp"
         android:layout_marginTop="20dp"
-        android:layout_marginHorizontal="10dp"
         android:gravity="center_vertical">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center_vertical|start"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_revert" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -22,7 +30,7 @@
             android:textSize="22sp"
             android:textStyle="bold"
             android:padding="15dp"
-            android:textColor="#1A1A1A"/>
+            android:textColor="#3E3429"/>
 
         <TextView
             android:id="@+id/txtSummaryMost"
@@ -33,6 +41,7 @@
             android:padding="3dp"
             android:text="Happy : -회"
             android:textAlignment="textEnd"
+            android:textColor="#888888"
             android:textSize="15sp" />
 
     </LinearLayout>
@@ -57,6 +66,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="2026년 1월"
+            android:textColor="#3E3429"
             android:textSize="18sp"
             android:textStyle="bold" />
 
