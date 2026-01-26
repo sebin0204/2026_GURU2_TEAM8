@@ -20,7 +20,7 @@
 
         <activity
             android:name=".review.ReviewActivity"
-            android:exported="false" />
+            android:exported="true" />
 
         <activity
             android:name=".WriteActivity"
