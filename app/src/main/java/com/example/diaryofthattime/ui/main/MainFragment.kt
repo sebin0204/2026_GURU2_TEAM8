@@ -1,9 +1,11 @@
 package com.example.diaryofthattime.ui.main
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import com.example.diaryofthattime.R
+import com.example.diaryofthattime.WriteActivity
 import com.example.diaryofthattime.databinding.FragmentMainBinding
 
 class MainFragment : Fragment(R.layout.fragment_main) {
@@ -17,13 +19,43 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
         // 감정 기록 화면 이동 (박세빈 화면)
         binding.btnWriteEmotion.setOnClickListener {
-            // 나중에 NavGraph 또는 FragmentTransaction 연결
+            val intent = Intent(requireContext(), WriteActivity::class.java)
+            startActivity(intent)
         }
 
         // 감정 보관함 이동 (최윤정 화면)
         binding.btnArchive.setOnClickListener {
             // 나중에 Archive_main.kt 연결
         }
+    }
+
+    //감정별 추천 극복 활동
+    override fun onResume() {
+        super.onResume()
+
+        // MainActivity로부터 감정 데이터를 확인
+        val emotion = activity?.intent?.getStringExtra("SELECTED_EMOTION")
+
+        if (emotion != null) {
+            showRecommendPopup(emotion)
+            activity?.intent?.removeExtra("SELECTED_EMOTION")
+        }
+    }
+
+    private fun showRecommendPopup(emotion: String) {
+        val recommendation = when (emotion) {
+            "무기력" -> "가벼운 산책이나 스트레칭은 어떨까요? 작은 움직임이 에너지를 줄 거예요."
+            "슬픔" -> "슬픈 감정을 억누르지 말고, 따뜻한 차 한 잔과 함께 좋아하는 음악을 들어보세요."
+            "불안" -> "6초간 숨을 들이마시고, 3초간 참고, 7초간 천천히 내뱉어보세요. 모든 일은 결국 다 지나가요."
+            "화남" -> "잠시 눈을 감고 10부터 1까지 천천히 세어보는 건 어떨까요?"
+            else -> "오늘 하루도 정말 고생 많으셨어요. 당신을 응원합니다! ✨"
+        }
+
+        androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setTitle("${emotion}을(를) 느끼고 계시는군요")
+            .setMessage(recommendation)
+            .setPositiveButton("확인", null)
+            .show()
     }
 
     override fun onDestroyView() {
