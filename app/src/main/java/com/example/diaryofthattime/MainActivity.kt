@@ -10,6 +10,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import com.example.diaryofthattime.ui.main.MainFragment
 import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
@@ -31,7 +32,7 @@ class MainActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
             // FragmentTransaction을 사용하여 프래그먼트를 화면에 붙입니다.
             supportFragmentManager.beginTransaction()
-                .replace(R.id.main, Archive_main())
+                .replace(R.id.main, MainFragment())
                 .commit()
         }
 
