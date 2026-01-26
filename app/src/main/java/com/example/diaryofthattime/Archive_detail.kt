@@ -220,15 +220,39 @@ class DiaryViewFragment : Fragment(R.layout.diary_view) {
                 val diary = db.diaryDao().getDiaryById(diaryId)
 
                 if (diary != null) {
-                    txtTitle.text = diary.title
+                    // [핵심 1] 회고 여부에 따른 수정 버튼 이동 경로 분기
+                    btnEdit.setOnClickListener {
+                        if (diary.isReviewed) {
+                            // 회고 완료 후 -> 회고 수정 페이지(ReviewActivity)
+                            val intent = Intent(requireContext(), ReviewActivity::class.java).apply {
+                                putExtra("diaryId", diaryId.toLong())
+                                putExtra("isEditMode", true)
+                            }
+                            startActivity(intent)
+                        } else {
+                            // 회고 전 -> 일기 작성 수정 페이지(WriteActivity)
+                            val intent = Intent(requireContext(), WriteActivity::class.java).apply {
+                                putExtra("diaryId", diaryId)
+                                putExtra("isEditMode", true)
+                            }
+                            startActivity(intent)
+                        }
+                    }
 
-                    // 사실/추측 태그 설정
-                    if (diary.stillFact == true) {
+                    // [2] 태그 표시 로직 변경 (회고 전/후 구분)
+                    // 회고가 완료되었다면 stillFact를 사용하고, 아니면 isFact를 사용합니다.
+                    val displayFact = if (diary.isReviewed) {
+                        diary.stillFact ?: diary.isFact // 회고 완료 시 stillFact 우선, 없으면 isFact
+                    } else {
+                        diary.isFact // 회고 전이면 무조건 isFact
+                    }
+
+                    if (displayFact) {
                         txtType.text = "사실"
-                        txtType.setBackgroundColor(android.graphics.Color.parseColor("#4CAF50"))
+                        txtType.setBackgroundColor(android.graphics.Color.parseColor("#8E9775")) // 올리브 민트
                     } else {
                         txtType.text = "추측"
-                        txtType.setBackgroundColor(android.graphics.Color.parseColor("#FF9800"))
+                        txtType.setBackgroundColor(android.graphics.Color.parseColor("#D4A373")) // 브릭 베이지
                     }
                     txtType.setTextColor(android.graphics.Color.WHITE)
 
