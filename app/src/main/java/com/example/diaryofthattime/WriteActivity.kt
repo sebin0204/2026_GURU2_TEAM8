@@ -96,7 +96,6 @@ class WriteActivity : AppCompatActivity() {
         }
         val isFact = binding.maybetrue.isChecked
 
-
         // D. 제목 가져오기(ID : editTextText2)
         val diaryTitle = binding.editTextText2.text.toString()
         if (diaryTitle.isBlank()) {

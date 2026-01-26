@@ -10,8 +10,6 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_marginHorizontal="10dp"
         android:gravity="center_vertical">
 
         <TextView
@@ -20,51 +18,20 @@
             android:text="나의 감정 성장 보관함"
             android:textSize="22sp"
             android:textStyle="bold"
-            android:padding="15dp"
+            android:padding="20dp"
             android:textColor="#1A1A1A"/>
 
         <TextView
             android:id="@+id/txtSummaryMost"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="10dp"
+            android:layout_margin="10dp"
             android:layout_weight="1"
             android:padding="3dp"
             android:text="Happy : -회"
             android:textAlignment="textEnd"
-            android:textSize="15sp" />
+            android:textSize="15dp" />
 
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:padding="5dp">
-
-        <ImageButton
-            android:id="@+id/btnPrevMonth"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_media_previous" />
-
-        <TextView
-            android:id="@+id/txtCurrentDate"
-            android:layout_width="120dp"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="2026년 1월"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-        <ImageButton
-            android:id="@+id/btnNextMonth"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_media_next" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
