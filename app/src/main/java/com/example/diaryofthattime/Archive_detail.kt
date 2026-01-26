@@ -162,8 +162,21 @@ class Archive_detail : Fragment(R.layout.archive_emotion_detail) {
             val item = items[position]
             holder.txtTitle.text = item.title
             holder.txtDate.text = SimpleDateFormat("MM월 dd일", Locale.KOREA).format(Date(item.date))
-            // 행복 페이지(overcome이 없는 UI)일 때는 에러 방지를 위해 체크 후 데이터 삽입
-            holder.txtOvercome?.text = item.overcomeWay
+
+            if (emotion != "행복") {
+                // 행복이 아닌 감정(슬픔, 불안 등)의 레이아웃에서만 실행
+                holder.txtOvercome?.let { textView ->
+                    if (item.overcomeWay.isNullOrBlank()) {
+                        textView.text = "아직 기록된 극복 방법이 없어요."
+                        textView.alpha = 0.5f // 안내 문구는 흐리게
+                    } else {
+                        textView.text = item.overcomeWay
+                        textView.alpha = 1.0f // 실제 기록은 진하게
+                    }
+                }
+            } else {
+                // 행복 페이지일 때는 아무것도 하지 않음
+            }
 
             // 아이템 전체 클릭 시 ID 전달
             holder.itemView.setOnClickListener { onItemClick(item.id) }
@@ -172,123 +185,4 @@ class Archive_detail : Fragment(R.layout.archive_emotion_detail) {
         override fun getItemCount() = items.size
     }
 
-}
-//일기 확인 로직
-class DiaryViewFragment : Fragment(R.layout.diary_view) {
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        val diaryId = arguments?.getInt("diaryId") ?: -1
-
-        // 뷰 연결 (XML ID에 맞춰 수정 필요)
-        val btnBack = view.findViewById<ImageButton>(R.id.btnBack)
-        val btnEdit = view.findViewById<ImageButton>(R.id.btnEdit)
-        val btnDelete = view.findViewById<ImageButton>(R.id.btnDelete)
-        val txtTitle = view.findViewById<TextView>(R.id.viewTitle)
-        val txtDate = view.findViewById<TextView>(R.id.viewDate)
-        val imgEmotion = view.findViewById<ImageView>(R.id.imgEmotion)
-        val txtContent = view.findViewById<TextView>(R.id.viewContent)
-        val txtMessage = view.findViewById<TextView>(R.id.viewMessage)
-        val overcomeLayout = view.findViewById<View>(R.id.overcomeLayout)
-        val labelOvercome = view.findViewById<TextView>(R.id.labelOvercome)
-        val txtOvercome = view.findViewById<TextView>(R.id.viewOvercome)
-
-        // 뒤로가기
-        btnBack.setOnClickListener { parentFragmentManager.popBackStack() }
-        //수정
-        btnEdit.setOnClickListener {
-            // WriteActivity가 작성과 수정을 같이 한다고 가정할 때
-            val intent = Intent(requireContext(), WriteActivity::class.java).apply {
-                // 택배 상자(Intent)에 데이터 담기
-                putExtra("diaryId", diaryId)      // 수정할 일기의 고유 ID
-                putExtra("isEditMode", true)     // 수정 모드임을 알리는 신호
-            }
-
-            // 액티비티 실행
-            startActivity(intent)
-
-            // 안내 메시지
-            Toast.makeText(requireContext(), "수정 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
-        }
-        //삭제
-        btnDelete.setOnClickListener {
-            // 삭제 확인 팝업창(Dialog) 바로 생성
-            AlertDialog.Builder(requireContext())
-                .setTitle("일기 삭제")
-                .setMessage("이 일기를 정말 삭제하시겠습니까?")
-                .setPositiveButton("삭제") { _, _ ->
-                    // [확인] 버튼을 눌렀을 때만 실제 DB 삭제 로직 실행
-                    lifecycleScope.launch {
-                        try {
-                            val db = AppDatabase.getDatabase(requireContext())
-                            val diary = db.diaryDao().getDiaryById(diaryId)
-
-                            if (diary != null) {
-                                db.diaryDao().delete(diary) // DB에서 삭제
-                                Toast.makeText(
-                                    requireContext(),
-                                    "일기가 삭제되었습니다.",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-
-                                //삭제 완료 후 이전 리스트 화면으로 돌아가기
-                                parentFragmentManager.popBackStack()
-                            }
-                        } catch (e: Exception) {
-                            Toast.makeText(
-                                requireContext(),
-                                "삭제 중 오류가 발생했습니다.",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    }
-                }
-                .setNegativeButton("취소", null) // 취소 누르면 아무 일도 안 일어남
-                .show()
-        }
-
-        // 데이터 로드 DB에서 데이터 가져오기
-        lifecycleScope.launch {
-            try {
-                val db = AppDatabase.getDatabase(requireContext())
-                val diary = db.diaryDao().getDiaryById(diaryId)
-
-                txtTitle.text = diary.title
-                txtDate.text =
-                    SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREA).format(Date(diary.date))
-                txtContent.text = diary.reason
-                txtMessage.text = diary.messageToMe ?: "나에게 남긴 메시지가 없습니다."
-
-                // [추가] 감정 텍스트를 이미지 리소스로 변환하여 적용
-                val emotionResId = getEmotionImage(diary.emotion)
-                imgEmotion.setImageResource(emotionResId)
-
-                // [조건부 표시] overcomeWay가 있을 때만 레이아웃을 보여줌
-                if (!diary.overcomeWay.isNullOrBlank()) {
-                    overcomeLayout.visibility = View.VISIBLE
-                    txtOvercome.text = diary.overcomeWay
-                    labelOvercome.text =
-                        if (diary.emotion == "행복") "✨ 행복의 순간" else "💡 이렇게 이겨냈어요"
-                } else {
-                    overcomeLayout.visibility = View.GONE
-                }
-            } catch (e: Exception) {
-                // 에러 처리: 로그를 남기고 사용자에게 알림
-                Log.e("DiaryView", "Error loading diary data", e)
-                Toast.makeText(requireContext(), "데이터 로드 중 오류가 발생했습니다.", Toast.LENGTH_SHORT)
-                    .show()
-                parentFragmentManager.popBackStack() // 에러 발생 시 리스트로 튕겨내기
-            }
-        }
-    }
-    // [추가] 감정 이름에 맞는 이미지 리소스를 반환하는 함수
-    private fun getEmotionImage(emotion: String?): Int {
-        return when (emotion) {
-            "행복" -> R.drawable.ic_launcher_foreground   // 실제 이미지 파일명으로 수정하세요
-            "무기력" -> R.drawable.ic_launcher_foreground
-            "슬픔" -> R.drawable.ic_launcher_foreground
-            "분노" -> R.drawable.ic_launcher_foreground
-            "불안" -> R.drawable.ic_launcher_foreground
-            else -> R.drawable.ic_launcher_foreground // 기본 이미지
-        }
-    }
 }
