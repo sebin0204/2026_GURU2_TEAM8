@@ -6,6 +6,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.diaryofthattime.R
+import com.example.diaryofthattime.Report_main
 import com.example.diaryofthattime.WriteActivity
 import com.example.diaryofthattime.data.AppDatabase
 import com.example.diaryofthattime.databinding.FragmentMainBinding
@@ -33,7 +34,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         // 감정 보관함 이동 (최윤정 화면)
         binding.btnArchive.setOnClickListener {
             parentFragmentManager.beginTransaction()
-                .replace(R.id.fragmentContainer, ArchiveFragment())
+                .replace(R.id.fragmentContainer, Report_main())
                 .addToBackStack(null)
                 .commit()
         }
