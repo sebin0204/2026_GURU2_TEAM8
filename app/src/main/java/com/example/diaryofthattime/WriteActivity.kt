@@ -4,6 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.RadioButton
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.diaryofthattime.data.AppDatabase
@@ -17,10 +19,7 @@ import java.util.Locale
 
 class WriteActivity : AppCompatActivity() {
 
-    // 1. 뷰 바인딩 설정
     private lateinit var binding: ActivityWriteBinding
-
-    // 수정 모드인지 판별하기 위한 변수
     private var diaryId: Int = -1
     private var isEditMode: Boolean = false
 
@@ -37,29 +36,58 @@ class WriteActivity : AppCompatActivity() {
         val sdf = SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREA)
         binding.textDate.text = sdf.format(System.currentTimeMillis())
 
-        // 수정 모드라면 기존 데이터를 불러와서 화면에 세팅
-        if (isEditMode && diaryId != -1) {
-            loadExistingData()
-            binding.write.text = "수정하기" // 버튼 텍스트 변경
+        // ★ 3. 최신 방식의 뒤로가기 콜백 설정 (onBackPressed 오류 해결)
+        val callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                val title = binding.editTextText2.text.toString()
+                val content = binding.editTextText.text.toString()
+
+                // 제목이나 내용이 입력되어 있으면 확인 팝업 출력
+                if (title.isNotBlank() || content.isNotBlank()) {
+                    AlertDialog.Builder(this@WriteActivity)
+                        .setTitle("작성 취소")
+                        .setMessage("작성 중인 일기가 저장되지 않습니다. 나가시겠습니까?")
+                        .setPositiveButton("나가기") { _, _ ->
+                            isEnabled = false // 콜백 비활성화
+                            onBackPressedDispatcher.onBackPressed() // 실제 뒤로가기 수행
+                        }
+                        .setNegativeButton("계속 쓰기", null)
+                        .show()
+                } else {
+                    isEnabled = false
+                    onBackPressedDispatcher.onBackPressed()
+                }
+            }
+        }
+        onBackPressedDispatcher.addCallback(this, callback)
+
+        // 4. 상단 뒤로가기 버튼 클릭 리스너 (XML에 ID: btnBack이 있어야 함)
+        binding.btnBack.setOnClickListener {
+            callback.handleOnBackPressed()
         }
 
-        // 3. 기록하기 버튼 클릭 (ID: write)
+        // 5. 수정 모드 데이터 로드
+        if (isEditMode && diaryId != -1) {
+            loadExistingData()
+            binding.write.text = "수정하기"
+        }
+
+        // 6. 기록하기 버튼 클릭
         binding.write.setOnClickListener {
             saveDiaryData()
         }
     }
-    // 기존 데이터를 불러와서 EditText와 RadioButton에 채워주는 함수
+
     private fun loadExistingData() {
         lifecycleScope.launch(Dispatchers.IO) {
             val db = AppDatabase.getDatabase(applicationContext)
-            val diary = db.diaryDao().getDiaryById(diaryId)
+            val diary = db.diaryDao().getDiaryById(diaryId) //
 
             withContext(Dispatchers.Main) {
                 diary?.let {
-                    binding.editTextText2.setText(it.title)      // 제목
-                    binding.editTextText.setText(it.reason)      // 내용
+                    binding.editTextText2.setText(it.title)
+                    binding.editTextText.setText(it.reason)
 
-                    // 감정(RadioButton) 체크 처리
                     for (i in 0 until binding.emotion.childCount) {
                         val rb = binding.emotion.getChildAt(i) as RadioButton
                         if (rb.text.toString() == it.emotion) {
@@ -68,16 +96,14 @@ class WriteActivity : AppCompatActivity() {
                         }
                     }
 
-                    // 사실 여부 체크 처리
                     if (it.isFact) binding.maybetrue.isChecked = true
-                    else binding.maybefalse.isChecked = true // false일 때의 ID가 maybefalse라고 가정
+                    else binding.maybefalse.isChecked = true
                 }
             }
         }
     }
 
     private fun saveDiaryData() {
-        // A. 선택된 감정 가져오기 (RadioGroup ID: emotion)
         val selectedEmotionId = binding.emotion.checkedRadioButtonId
         if (selectedEmotionId == -1) {
             Toast.makeText(this, "현재의 감정을 선택해주세요!", Toast.LENGTH_SHORT).show()
@@ -85,14 +111,12 @@ class WriteActivity : AppCompatActivity() {
         }
         val emotion = findViewById<RadioButton>(selectedEmotionId).text.toString()
 
-        // B. 작성한 내용 가져오기 (EditText ID: editTextText)
         val reason = binding.editTextText.text.toString()
         if (reason.isBlank()) {
             Toast.makeText(this, "내용을 입력해주세요!", Toast.LENGTH_SHORT).show()
             return
         }
 
-        // C. 사실 여부 가져오기 (RadioButton ID: maybetrue 가 체크되었는지 확인)
         val selectedQuestionId = binding.question.checkedRadioButtonId
         if (selectedQuestionId == -1) {
             Toast.makeText(this, "사실인지 추측인지 선택해주세요!", Toast.LENGTH_SHORT).show()
@@ -100,16 +124,14 @@ class WriteActivity : AppCompatActivity() {
         }
         val isFact = binding.maybetrue.isChecked
 
-        // D. 제목 가져오기(ID : editTextText2)
         val diaryTitle = binding.editTextText2.text.toString()
         if (diaryTitle.isBlank()) {
             Toast.makeText(this, "일기의 제목을 입력해주세요!", Toast.LENGTH_SHORT).show()
             return
         }
 
-        // E. 저장할 Diary 객체 생성
-        val DiaryData = Diary(
-            id = if (isEditMode) diaryId else 0, //수정이면 기존 ID, 새 저장이면 0
+        val diaryData = Diary(
+            id = if (isEditMode) diaryId else 0,
             title = diaryTitle,
             emotion = emotion,
             reason = reason,
@@ -118,19 +140,16 @@ class WriteActivity : AppCompatActivity() {
             isReviewed = isEditMode
         )
 
-        // F. Room DB에 저장 (비동기 처리)
         val db = AppDatabase.getDatabase(applicationContext)
         lifecycleScope.launch(Dispatchers.IO) {
             if (isEditMode) {
-                // 기존 일기 수정 (Update)
-                db.diaryDao().update(DiaryData)
+                db.diaryDao().update(diaryData)
             } else {
-                // 새 일기 저장 (Insert)
-                db.diaryDao().insert(DiaryData)
+                db.diaryDao().insert(diaryData)
             }
 
-            // 작업 완료 후 메인 스레드에서 화면 닫기
             withContext(Dispatchers.Main) {
+
                 val msg = if (isEditMode) "일기가 수정되었습니다!" else "오늘의 일기가 저장되었습니다!"
                 Toast.makeText(this@WriteActivity, msg, Toast.LENGTH_SHORT).show()
 

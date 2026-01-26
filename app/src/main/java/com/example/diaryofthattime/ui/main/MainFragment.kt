@@ -3,14 +3,16 @@ package com.example.diaryofthattime.ui.main
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.example.diaryofthattime.R
 import com.example.diaryofthattime.Archive_main
+import com.example.diaryofthattime.DiaryDetailActivity // 상세 페이지 import 추가
+import com.example.diaryofthattime.R
+import com.example.diaryofthattime.ReviewActivity
 import com.example.diaryofthattime.WriteActivity
 import com.example.diaryofthattime.data.AppDatabase
 import com.example.diaryofthattime.databinding.FragmentMainBinding
-import com.example.diaryofthattime.ui.archive.ArchiveFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -25,16 +27,17 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentMainBinding.bind(view)
 
+
         // 달력 잔상을 막기 위해 현재 시간으로 명시적 설정
         binding.calendarView.date = System.currentTimeMillis()
 
-        // 감정 기록 화면 이동 (박세빈 화면)
+        // 1. 감정 기록 화면 이동 (박세빈 화면)
         binding.btnWriteEmotion.setOnClickListener {
             val intent = Intent(requireContext(), WriteActivity::class.java)
             startActivity(intent)
         }
 
-        // 감정 보관함 이동 (최윤정 화면)
+        // 2. 감정 보관함 이동 (최윤정 화면)
         binding.btnArchive.setOnClickListener {
             parentFragmentManager.beginTransaction()
                 .replace(R.id.main, Archive_main())
@@ -43,43 +46,34 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         }
 
         /* -------------------------
-         * 3. 달력 날짜 선택 → 출석 여부 판단
+         * 3. 달력 날짜 선택 → 출석 여부 판단 및 상세 페이지 이동
          * ------------------------- */
-        val diaryDao = AppDatabase
-            .getDatabase(requireContext())
-            .diaryDao()
+        val diaryDao = AppDatabase.getDatabase(requireContext()).diaryDao()
 
         binding.calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
 
-            // Calendar는 month가 0부터 시작
             val calendar = Calendar.getInstance().apply {
-                set(Calendar.YEAR, year)
-                set(Calendar.MONTH, month)
-                set(Calendar.DAY_OF_MONTH, dayOfMonth)
-                set(Calendar.HOUR_OF_DAY, 0)
-                set(Calendar.MINUTE, 0)
-                set(Calendar.SECOND, 0)
+                set(year, month, dayOfMonth, 0, 0, 0)
                 set(Calendar.MILLISECOND, 0)
             }
-
             val startOfDay = calendar.timeInMillis
 
-            calendar.apply {
-                set(Calendar.HOUR_OF_DAY, 23)
-                set(Calendar.MINUTE, 59)
-                set(Calendar.SECOND, 59)
-                set(Calendar.MILLISECOND, 999)
-            }
-
+            calendar.set(year, month, dayOfMonth, 23, 59, 59)
+            calendar.set(Calendar.MILLISECOND, 999)
             val endOfDay = calendar.timeInMillis
 
-            // DB에서 해당 날짜 출석 여부 확인
             lifecycleScope.launch(Dispatchers.IO) {
-                val count = diaryDao.hasDiaryOnDate(startOfDay, endOfDay)
+                // 해당 날짜의 일기 객체를 직접 가져옵니다.
+                val diary = diaryDao.getDiaryByDateRange(startOfDay, endOfDay)
 
                 withContext(Dispatchers.Main) {
-                    if (count > 0) {
+                    if (diary != null) {
                         binding.txtAttendanceStatus.text = "출석 완료 ✔"
+
+                        // ★ 일기가 있는 날짜를 클릭하면 상세 페이지로 이동 ★
+                        val intent = Intent(requireContext(), DiaryDetailActivity::class.java)
+                        intent.putExtra("DIARY_ID", diary.id) // DiaryDetailActivity에서 받을 키값
+                        startActivity(intent)
                     } else {
                         binding.txtAttendanceStatus.text = "아직 기록이 없어요"
                     }
@@ -88,13 +82,10 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         }
     }
 
-    //감정별 추천 극복 활동
+    // 감정별 추천 극복 활동 팝업 (기존 로직 유지)
     override fun onResume() {
         super.onResume()
-
-        // MainActivity로부터 감정 데이터를 확인
         val emotion = activity?.intent?.getStringExtra("SELECTED_EMOTION")
-
         if (emotion != null) {
             showRecommendPopup(emotion)
             activity?.intent?.removeExtra("SELECTED_EMOTION")
