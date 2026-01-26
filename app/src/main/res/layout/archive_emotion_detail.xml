@@ -13,8 +13,7 @@
         android:textSize="24sp"
         android:textStyle="bold"
         android:gravity="center"
-        android:padding="10dp"
-        android:layout_marginTop="20dp"
+        android:padding="20dp"
         android:textColor="#333333"/>
 
     <LinearLayout
@@ -22,7 +21,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="horizontal"
-        android:padding="10dp">
+        android:paddingBottom="10dp">
 
         <ImageButton
             android:id="@+id/btnPrevMonth"
@@ -54,16 +53,5 @@
         android:layout_height="match_parent"
         android:padding="16dp"
         android:clipToPadding="false"/>
-
-    <TextView
-        android:id="@+id/txtNoData"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
-        android:gravity="center"
-        android:text="이번 달은 아직 기록이 없어요!\n나의 감정을 기록해보세요.✨"
-        android:textColor="#9E9E9E"
-        android:textSize="16sp"
-        android:visibility="gone" />
 
 </LinearLayout>
