@@ -16,22 +16,15 @@ class HappyReminderWorker(context: Context, params: WorkerParameters) : Worker(c
     override fun doWork(): Result {
         val db = AppDatabase.getDatabase(applicationContext)
 
-        // DB에서 '행복' 감정인 일기들만 가져오기 (Dao에 쿼리가 없다면 아래처럼 코루틴 활용)
-        // 여기서는 간단히 모든 일기를 가져와 필터링하는 예시입니다.
-        // 더 효율적으로 하려면 Dao에 getHappyDiaries()를 만드셔도 좋습니다.
-
-        var result: Result = Result.success()
-
-        // Worker는 CoroutineScope가 아니므로 runBlocking을 쓰거나 로직을 잘 구성해야 합니다.
-        // 하지만 가장 권장되는 방식은 ListenableWorker를 쓰는 것이나,
-        // 여기선 간단하게 구현하겠습니다.
-
+        // DB에서 '행복' 감정인 일기들만 가져오기
         val happyDiaries = db.diaryDao().getHappyDiariesSync() // (아래 Dao 설명 참고)
 
         if (!happyDiaries.isNullOrEmpty()) {
             val randomDiary = happyDiaries.random()
             // 알림에 ID와 제목을 함께 보냅니다.
             sendNotification(randomDiary.id, randomDiary.title)
+
+            return Result.success()
         }
 
         return Result.success()

@@ -28,11 +28,11 @@ class WriteActivity : AppCompatActivity() {
         binding = ActivityWriteBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // 1. 인텐트 데이터 확인 (수정 모드 여부)
+        // 💡 [수정] 외부(Fragment 등)에서 보낸 데이터(ID와 수정모드 여부)를 받습니다.
         diaryId = intent.getIntExtra("diaryId", -1)
         isEditMode = intent.getBooleanExtra("isEditMode", false)
 
-        // 2. 오늘 날짜 표시
+        // 2. 오늘 날짜 표시 (ID: textDate)
         val sdf = SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREA)
         binding.textDate.text = sdf.format(System.currentTimeMillis())
 
@@ -137,7 +137,7 @@ class WriteActivity : AppCompatActivity() {
             reason = reason,
             isFact = isFact,
             date = System.currentTimeMillis(),
-            isReviewed = false
+            isReviewed = isEditMode
         )
 
         val db = AppDatabase.getDatabase(applicationContext)
@@ -149,7 +149,10 @@ class WriteActivity : AppCompatActivity() {
             }
 
             withContext(Dispatchers.Main) {
-                Toast.makeText(this@WriteActivity, "성공적으로 저장되었습니다!", Toast.LENGTH_SHORT).show()
+
+                val msg = if (isEditMode) "일기가 수정되었습니다!" else "오늘의 일기가 저장되었습니다!"
+                Toast.makeText(this@WriteActivity, msg, Toast.LENGTH_SHORT).show()
+
                 val intent = Intent(this@WriteActivity, MainActivity::class.java)
                 intent.putExtra("SELECTED_EMOTION", emotion)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP

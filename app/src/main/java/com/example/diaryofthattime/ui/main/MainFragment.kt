@@ -27,6 +27,10 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentMainBinding.bind(view)
 
+
+        // 달력 잔상을 막기 위해 현재 시간으로 명시적 설정
+        binding.calendarView.date = System.currentTimeMillis()
+
         // 1. 감정 기록 화면 이동 (박세빈 화면)
         binding.btnWriteEmotion.setOnClickListener {
             val intent = Intent(requireContext(), WriteActivity::class.java)
@@ -36,7 +40,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         // 2. 감정 보관함 이동 (최윤정 화면)
         binding.btnArchive.setOnClickListener {
             parentFragmentManager.beginTransaction()
-                .replace(R.id.fragmentContainer, Archive_main())
+                .replace(R.id.main, Archive_main())
                 .addToBackStack(null)
                 .commit()
         }

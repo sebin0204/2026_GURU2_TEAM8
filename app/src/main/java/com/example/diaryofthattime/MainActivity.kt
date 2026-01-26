@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
             // FragmentTransaction을 사용하여 프래그먼트를 화면에 붙입니다.
             supportFragmentManager.beginTransaction()
-                .replace(R.id.main, MainFragment())
+                .replace(R.id.fragmentContainer, MainFragment())
                 .commit()
         }
 

@@ -115,98 +115,27 @@ class Archive_detail : Fragment(R.layout.archive_emotion_detail) {
             val item = items[position]
             holder.txtTitle.text = item.title
             holder.txtDate.text = SimpleDateFormat("MM월 dd일", Locale.KOREA).format(Date(item.date))
-            holder.txtOvercome?.text = item.overcomeWay
+
+            if (emotion != "행복") {
+                // 행복이 아닌 감정(슬픔, 불안 등)의 레이아웃에서만 실행
+                holder.txtOvercome?.let { textView ->
+                    if (item.overcomeWay.isNullOrBlank()) {
+                        textView.text = "아직 기록된 극복 방법이 없어요."
+                        textView.alpha = 0.5f // 안내 문구는 흐리게
+                    } else {
+                        textView.text = item.overcomeWay
+                        textView.alpha = 1.0f // 실제 기록은 진하게
+                    }
+                }
+            } else {
+                // 행복 페이지일 때는 아무것도 하지 않음
+            }
+
+            // 아이템 전체 클릭 시 ID 전달
             holder.itemView.setOnClickListener { onItemClick(item.id) }
         }
 
         override fun getItemCount() = items.size
     }
-}
 
-// 일기 확인 로직
-class DiaryViewFragment : Fragment(R.layout.diary_view) {
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        val diaryId = arguments?.getInt("diaryId") ?: -1
-
-        val btnBack = view.findViewById<ImageButton>(R.id.btnBack)
-        val btnEdit = view.findViewById<ImageButton>(R.id.btnEdit)
-        val btnDelete = view.findViewById<ImageButton>(R.id.btnDelete)
-        val txtTitle = view.findViewById<TextView>(R.id.viewTitle)
-        val txtDate = view.findViewById<TextView>(R.id.viewDate)
-        val imgEmotion = view.findViewById<ImageView>(R.id.imgEmotion)
-        val txtContent = view.findViewById<TextView>(R.id.viewContent)
-        val txtMessage = view.findViewById<TextView>(R.id.viewMessage)
-        val overcomeLayout = view.findViewById<View>(R.id.layoutOvercomeResult)
-        val imgStamp = view.findViewById<ImageView>(R.id.imgOvercomeStamp)
-        val txtOvercome = view.findViewById<TextView>(R.id.textOvercomeWay)
-
-        btnBack.setOnClickListener { parentFragmentManager.popBackStack() }
-
-        btnEdit.setOnClickListener {
-            val intent = Intent(requireContext(), WriteActivity::class.java).apply {
-                putExtra("diaryId", diaryId)
-                putExtra("isEditMode", true)
-            }
-            startActivity(intent)
-        }
-
-        btnDelete.setOnClickListener {
-            AlertDialog.Builder(requireContext())
-                .setTitle("일기 삭제")
-                .setMessage("정말 삭제하시겠습니까?")
-                .setPositiveButton("삭제") { _, _ ->
-                    lifecycleScope.launch {
-                        val db = AppDatabase.getDatabase(requireContext())
-                        val diary = db.diaryDao().getDiaryById(diaryId)
-                        if (diary != null) {
-                            db.diaryDao().delete(diary)
-                            Toast.makeText(requireContext(), "삭제되었습니다.", Toast.LENGTH_SHORT).show()
-                            parentFragmentManager.popBackStack()
-                        }
-                    }
-                }
-                .setNegativeButton("취소", null).show()
-        }
-
-        lifecycleScope.launch {
-            try {
-                val db = AppDatabase.getDatabase(requireContext())
-                val diary = db.diaryDao().getDiaryById(diaryId)
-
-                // [수정] 널 체크를 위한 ?. 사용
-                txtTitle.text = diary?.title
-                txtDate.text = diary?.date?.let { SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREA).format(Date(it)) } ?: ""
-                txtContent.text = diary?.reason
-                txtMessage.text = diary?.messageToMe ?: "나에게 남긴 메시지가 없습니다."
-
-                imgEmotion.setImageResource(getEmotionImage(diary?.emotion))
-
-                // [통합] 세빈 팀장님의 도장 로직 적용
-                if (diary?.isReviewed == true) {
-                    overcomeLayout.visibility = View.VISIBLE
-                    imgStamp.visibility = View.VISIBLE
-                    imgStamp.setImageResource(R.drawable.stemp) // stemp.png
-                    txtOvercome.text = diary.overcomeWay
-                } else {
-                    overcomeLayout.visibility = View.GONE
-                    imgStamp.visibility = View.GONE
-                }
-            } catch (e: Exception) {
-                Log.e("DiaryView", "Error", e)
-                parentFragmentManager.popBackStack()
-            }
-        }
-    }
-
-    private fun getEmotionImage(emotion: String?): Int {
-        return when (emotion) {
-            "행복" -> R.drawable.ic_launcher_foreground // 실제 파일명으로 교체
-            "무기력" -> R.drawable.ic_launcher_foreground
-            "슬픔" -> R.drawable.ic_launcher_foreground
-            "화남" -> R.drawable.ic_launcher_foreground
-            "불안" -> R.drawable.ic_launcher_foreground
-            else -> R.drawable.ic_launcher_foreground
-        }
-    }
 }
