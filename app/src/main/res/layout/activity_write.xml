@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="20dp"
+    android:background="#EDE2D0"
     tools:context=".WriteActivity">
 
     <ImageButton
@@ -15,6 +16,7 @@
         android:clickable="true"
         android:focusable="true"
         android:src="@android:drawable/ic_menu_revert"
+        android:backgroundTint="#EDE2D0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -123,7 +125,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
-        android:backgroundTint="#673AB7"
+        android:backgroundTint="#9B7F61"
         android:text="기록하기"
         android:textColor="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"

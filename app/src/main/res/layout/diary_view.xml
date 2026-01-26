@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF">
+    android:background="#EDE2D0">
 
     <FrameLayout
         android:id="@+id/topBar"
@@ -19,7 +19,7 @@
             android:layout_gravity="center_vertical|start"
             android:layout_marginStart="8dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/baseline_arrow_back_24" />
+            android:src="@android:drawable/ic_menu_revert" />
 
         <TextView
             android:id="@+id/viewDate"
@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="2026년 01월 24일"
-            android:textColor="#9E9E9E"
+            android:textColor="#888888"
             android:textSize="14sp" />
 
         <LinearLayout
@@ -43,7 +43,7 @@
                 android:layout_height="48dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@android:drawable/ic_menu_edit"
-                app:tint="#4A69FF" />
+                app:tint="#888888" />
 
             <ImageButton
                 android:id="@+id/btnDelete"
@@ -51,7 +51,7 @@
                 android:layout_height="48dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@android:drawable/ic_menu_delete"
-                app:tint="#FF5252" />
+                app:tint="#DAA38F" />
         </LinearLayout>
     </FrameLayout>
 
@@ -103,7 +103,7 @@
                             android:maxLines="1"
                             android:maxWidth="200dp"
                             android:text="일기 제목"
-                            android:textColor="#212121"
+                            android:textColor="#3E3429"
                             android:textSize="20sp"
                             android:textStyle="bold" />
 
@@ -127,7 +127,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:text="나에게 전하는 따뜻한 한마디"
-                        android:textColor="#90A4AE"
+                        android:textColor="#2A52BE"
                         android:textSize="13sp"
                         android:textStyle="italic" />
                 </LinearLayout>
@@ -137,7 +137,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginVertical="18dp"
-                android:background="#F0F0F0" />
+                android:background="#888888" />
 
             <TextView
                 android:id="@+id/viewContent"
@@ -145,19 +145,18 @@
                 android:layout_height="wrap_content"
                 android:minHeight="350dp"
 
-                android:layout_marginHorizontal="10dp"
                 android:padding="15dp"
                 android:background="#FAFAFA"
                 android:lineSpacingExtra="8dp"
                 android:text="일기 내용이 출력되는 부분입니다."
-                android:textColor="#424242"
+                android:textColor="#3E3429"
                 android:textSize="17sp" />
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginVertical="18dp"
-                android:background="#F0F0F0" />
+                android:background="#888888" />
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -167,7 +166,7 @@
                     android:id="@+id/overcomeLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="10dp"
+
                     android:background="#F8F9FA"
                     android:orientation="vertical"
                     android:padding="20dp">
@@ -177,7 +176,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="💡 극복 방법"
-                        android:textColor="#607D8B"
+                        android:textColor="#2A52BE"
                         android:textSize="13sp"
                         android:textStyle="bold" />
 
@@ -187,7 +186,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:text="이겨낸 방법 또는 기록이 표시됩니다."
-                        android:textColor="#263238"
+                        android:textColor="#3E3429"
                         android:textSize="15sp" />
                 </LinearLayout>
 

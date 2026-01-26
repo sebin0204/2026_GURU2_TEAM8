@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="24dp"
+    android:background="#EDE2D0"
     tools:context="com.example.diaryofthattime.ui.main.MainFragment">
 
     <!-- 앱 타이틀 -->
@@ -53,8 +54,10 @@
             android:id="@+id/calendarView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:theme="@style/CustomCalendarTheme"
             android:showWeekNumber="false"
-            android:firstDayOfWeek="1" />
+            android:firstDayOfWeek="1"
+            />
 
         <!-- 출석 상태 표시 (나중에 이미지로 교체 예정) -->
         <TextView
@@ -73,6 +76,7 @@
         android:id="@+id/btnWriteEmotion"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:backgroundTint="#9B7F61"
         android:text="감정 기록하기" />
 
     <!-- 감정 보관함 버튼 -->
@@ -81,6 +85,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="감정 보관함"
+        android:backgroundTint="#9B7F61"
         android:layout_marginTop="8dp" />
 
 </LinearLayout>

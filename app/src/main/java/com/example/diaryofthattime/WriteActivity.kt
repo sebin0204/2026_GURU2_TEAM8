@@ -28,7 +28,7 @@ class WriteActivity : AppCompatActivity() {
         binding = ActivityWriteBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // 💡 [수정] 외부(Fragment 등)에서 보낸 데이터(ID와 수정모드 여부)를 받습니다.
+        // [수정] 외부(Fragment 등)에서 보낸 데이터(ID와 수정모드 여부)를 받습니다.
         diaryId = intent.getIntExtra("diaryId", -1)
         isEditMode = intent.getBooleanExtra("isEditMode", false)
 
@@ -130,18 +130,18 @@ class WriteActivity : AppCompatActivity() {
             return
         }
 
-        val diaryData = Diary(
-            id = if (isEditMode) diaryId else 0,
-            title = diaryTitle,
-            emotion = emotion,
-            reason = reason,
-            isFact = isFact,
-            date = System.currentTimeMillis(),
-            isReviewed = isEditMode
-        )
-
-        val db = AppDatabase.getDatabase(applicationContext)
         lifecycleScope.launch(Dispatchers.IO) {
+            val db = AppDatabase.getDatabase(applicationContext)
+            val existingDiary = if (isEditMode) db.diaryDao().getDiaryById(diaryId) else null
+            val diaryData = Diary(
+                id = if (isEditMode) diaryId else 0,
+                title = diaryTitle,
+                emotion = emotion,
+                reason = reason,
+                isFact = isFact,
+                date = System.currentTimeMillis()
+            )
+
             if (isEditMode) {
                 db.diaryDao().update(diaryData)
             } else {
