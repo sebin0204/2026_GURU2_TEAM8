@@ -20,7 +20,7 @@ class WriteActivity : AppCompatActivity() {
     // 1. 뷰 바인딩 설정
     private lateinit var binding: ActivityWriteBinding
 
-    // ⭐ 수정 모드인지 판별하기 위한 변수
+    // 수정 모드인지 판별하기 위한 변수
     private var diaryId: Int = -1
     private var isEditMode: Boolean = false
 
@@ -119,10 +119,10 @@ class WriteActivity : AppCompatActivity() {
         val db = AppDatabase.getDatabase(applicationContext)
         lifecycleScope.launch(Dispatchers.IO) {
             if (isEditMode) {
-                // ⭐ 기존 일기 수정 (Update)
+                // 기존 일기 수정 (Update)
                 db.diaryDao().update(DiaryData)
             } else {
-                // ⭐ 새 일기 저장 (Insert)
+                // 새 일기 저장 (Insert)
                 db.diaryDao().insert(DiaryData)
             }
 
