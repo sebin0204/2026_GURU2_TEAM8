@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,8 +14,7 @@ import com.example.diaryofthattime.data.AppDatabase
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
-// 통계 데이터를 담기 위한 클래스들
-data class EmotionCount(val emotion: String, val count: Int)
+// UI 전용 보고서 데이터 클래스
 data class EmotionReport(val name: String, val count: Int, val bestWay: String)
 
 class Archive_main : Fragment(R.layout.archive_emotion) {
@@ -61,46 +59,38 @@ class Archive_main : Fragment(R.layout.archive_emotion) {
 
         lifecycleScope.launch {
             val db = AppDatabase.getDatabase(requireContext())
+            // Dao의 쿼리 함수명을 확인하세요. (getDiariesByMonth 기준)
             db.diaryDao().getDiariesByMonth(yearStr, monthStr).collect { diaries ->
 
                 val fixedEmotions = listOf("행복", "무기력", "슬픔", "불안", "화남")
 
                 val reportList = fixedEmotions.map { emotionName ->
                     val filteredDiaries = diaries.filter { it.emotion == emotionName }
-                    val count = filteredDiaries.size
 
+                    // 최근 기록된 극복 방법 가져오기
                     val lastOvercome = filteredDiaries.firstOrNull { !it.overcomeWay.isNullOrBlank() }?.overcomeWay
                         ?: "아직 기록된 극복 방법이 없어요."
 
-                    EmotionReport(
-                        name = emotionName,
-                        count = count,
-                        bestWay = lastOvercome
-                    )
+                    EmotionReport(emotionName, filteredDiaries.size, lastOvercome)
                 }
 
                 val happyCount = reportList.find { it.name == "행복" }?.count ?: 0
                 txtSummary.text = "행복 : ${if (happyCount > 0) "${happyCount}회" else "- 회"}"
 
                 rv.layoutManager = LinearLayoutManager(requireContext())
-                
-rv.adapter = EmotionCardAdapter(
-    reportList,
-    onCardClick = { clicked -> 
-        // 💡 카드 전체 클릭: 해당 월/감정의 '모든' 일기 (false)
-        moveToDetail(clicked.name, false) 
-    },
-    onOvercomeBtnClick = { clicked -> 
-        // 💡 버튼 클릭: 해당 월/감정의 '회고 완료' 일기만 (true)
-        moveToDetail(clicked.name, true)  
-    }
-)
-
+                rv.adapter = EmotionCardAdapter(
+                    reportList,
+                    onCardClick = { clicked ->
+                        moveToDetail(clicked.name, false)
+                    },
+                    onMethodClick = { clicked ->
+                        moveToDetail(clicked.name, true)
+                    }
+                )
             }
         }
     }
 
-    
     private fun moveToDetail(emotionName: String, onlyOvercome: Boolean) {
         val detailFragment = Archive_detail().apply {
             arguments = Bundle().apply {
@@ -117,7 +107,6 @@ rv.adapter = EmotionCardAdapter(
     }
 }
 
-// 💡 [수정] 어댑터 클래스는 Archive_main 클래스 외부(파일 하단)에 있는 것이 깔끔합니다.
 class EmotionCardAdapter(
     private val items: List<EmotionReport>,
     private val onCardClick: (EmotionReport) -> Unit,
@@ -125,10 +114,10 @@ class EmotionCardAdapter(
 ) : RecyclerView.Adapter<EmotionCardAdapter.ViewHolder>() {
 
     class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
-        val card = v.findViewById<CardView>(R.id.cardView)
-        val title = v.findViewById<TextView>(R.id.txtEmotionTitle)
-        val count = v.findViewById<TextView>(R.id.txtEmotionCount)
-        val method = v.findViewById<TextView>(R.id.OvercomeMethod)
+        val title: TextView = v.findViewById(R.id.txtEmotionTitle)
+        val count: TextView = v.findViewById(R.id.txtEmotionCount)
+        val method: TextView = v.findViewById(R.id.OvercomeMethod)
+        val btnOvercome: TextView = v.findViewById(R.id.btnGoToOvercome)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -142,11 +131,8 @@ class EmotionCardAdapter(
         holder.count.text = if (data.count > 0) "이번 달 ${data.count}회" else "이번 달 -회"
         holder.method.text = data.bestWay
 
-        // 카드 전체 클릭
         holder.itemView.setOnClickListener { onCardClick(data) }
-
-        // 극복 방법 텍스트 클릭
-        holder.method.setOnClickListener { onMethodClick(data) }
+        holder.btnOvercome.setOnClickListener { onMethodClick(data) }
     }
 
     override fun getItemCount() = items.size
