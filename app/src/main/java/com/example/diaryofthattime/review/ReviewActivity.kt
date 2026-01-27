@@ -121,8 +121,18 @@ class ReviewActivity : AppCompatActivity() {
                 this.overcomeWay = overcomeWay
                 this.messageToMe = messageToMe
             }
+            // [수정] targetDiary 객체의 값을 직접 수정하고 업데이트합니다.
+            targetDiary?.let { diary ->
+                diary.isReviewed = true // 이 값이 true여야 상세페이지에서 도장이 보입니다!
+                diary.stillFact = stillFactValue
+                diary.overcomeWay = way
+                diary.messageToMe = message
 
-            targetDiary?.let { db.diaryDao().update(it) }
+                db.diaryDao().update(diary)
+
+                // 데이터가 잘 저장됐는지 로그캣에 찍어봅니다.
+                android.util.Log.d("DiaryTest", "저장 완료! isReviewed: ${diary.isReviewed}")
+            }
 
             withContext(Dispatchers.Main) {
                 val msg = if (isEditMode) {
@@ -131,6 +141,7 @@ class ReviewActivity : AppCompatActivity() {
                     "오늘의 성장을 기록했습니다! ✨"
                 }
                 Toast.makeText(this@ReviewActivity, msg, Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@ReviewActivity, "극복 완료!", Toast.LENGTH_SHORT).show()
                 finish()
             }
         }

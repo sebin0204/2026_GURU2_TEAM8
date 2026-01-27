@@ -55,11 +55,17 @@ class DiaryDetailActivity : AppCompatActivity() {
         binding.textDetailDate.text = sdf.format(Date(diary.date))
 
         // 4. 회고 완료 여부에 따른 도장 및 결과 표시
-        if (diary.isReviewed) { //
-            // 회고 텍스트 영역 보여주기
+        if (diary.isReviewed) {
+            // 회고 데이터 표시
             binding.layoutOvercomeResult.visibility = View.VISIBLE
             binding.textOvercomeWay.text = diary.overcomeWay
             binding.textMessageToMe.text = "미래의 나에게: ${diary.messageToMe}"
+            binding.imgOvercomeStamp.apply {
+                visibility = View.VISIBLE
+                elevation = 100f      // 노란 박스보다 훨씬 높게 띄움
+                bringToFront()        // 레이어 순서를 맨 앞으로
+                requestLayout()       // 화면 갱신 강제 요청
+            }
 
             // ★ 도장 보여주기 및 애니메이션 ★
             binding.imgOvercomeStamp.visibility = View.VISIBLE //
@@ -67,6 +73,7 @@ class DiaryDetailActivity : AppCompatActivity() {
             // 도장이 '쾅' 하고 찍히는 느낌의 애니메이션 추가
             val stampAnim = AnimationUtils.loadAnimation(this, android.R.anim.fade_in)
             binding.imgOvercomeStamp.startAnimation(stampAnim)
+            binding.imgOvercomeStamp.visibility = View.VISIBLE
         } else {
             binding.layoutOvercomeResult.visibility = View.GONE
             binding.imgOvercomeStamp.visibility = View.GONE

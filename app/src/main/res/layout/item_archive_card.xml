@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="16dp"
     android:layout_marginVertical="8dp"
     app:cardCornerRadius="16dp"
-    app:cardElevation="4dp"
-    android:id="@+id/cardView">
+    app:cardElevation="4dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="#FDFBF7"
         android:orientation="vertical"
-        android:padding="20dp"
-        android:background="#FDFBF7">
+        android:padding="20dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -28,17 +28,18 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="슬픔"
+                android:textColor="#3E3429"
                 android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="#3E3429"/>
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/txtEmotionCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_count_tag"
+                android:gravity="center"
+                android:minHeight="32dp"
                 android:paddingHorizontal="10dp"
-                android:paddingVertical="4dp"
                 android:text="이번 달 5회"
                 android:textColor="#9B7F61"
                 android:textSize="12sp" />
@@ -51,23 +52,30 @@
             android:background="#E6DCCB" />
 
         <TextView
+            android:id="@+id/btnGoToOvercome"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="30dp"
+            android:background="@drawable/bg_count_tag"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:minWidth="48dp"
+            android:minHeight="48dp"
+            android:paddingHorizontal="12dp"
             android:text="최근 극복 방법"
+            android:textColor="#9B7F61"
             android:textSize="12sp"
-            android:textColor="#2A52BE"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/OvercomeMethod"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="8dp"
+            android:lineSpacingExtra="4dp"
             android:text="따뜻한 차를 마시며 좋아하는 음악을 들었어요."
-            android:textSize="14sp"
             android:textColor="#3E3429"
-            android:lineSpacingExtra="4dp" />
+            android:textSize="14sp" />
 
     </LinearLayout>
-
 </androidx.cardview.widget.CardView>
