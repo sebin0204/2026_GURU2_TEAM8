@@ -51,13 +51,13 @@
             android:background="#E6DCCB" />
 
         <Button
-            android:id="@+/btnGoToOvercome"
+						android:id="@+/btnGoToOvercome"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="최근 극복 방법"
             android:textSize="12sp"
             android:textColor="#2A52BE"
-            android:textStyle="bold"  />
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/OvercomeMethod"

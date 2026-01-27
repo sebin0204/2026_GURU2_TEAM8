@@ -83,16 +83,24 @@ class Archive_main : Fragment(R.layout.archive_emotion) {
                 txtSummary.text = "행복 : ${if (happyCount > 0) "${happyCount}회" else "- 회"}"
 
                 rv.layoutManager = LinearLayoutManager(requireContext())
-                rv.adapter = EmotionCardAdapter(
-                    reportList,
-                    onCardClick = { clicked -> moveToDetail(clicked.name, false) },
-                    onMethodClick = { clicked -> moveToDetail(clicked.name, true) }
-                )
+                
+rv.adapter = EmotionCardAdapter(
+    reportList,
+    onCardClick = { clicked -> 
+        // 💡 카드 전체 클릭: 해당 월/감정의 '모든' 일기 (false)
+        moveToDetail(clicked.name, false) 
+    },
+    onOvercomeBtnClick = { clicked -> 
+        // 💡 버튼 클릭: 해당 월/감정의 '회고 완료' 일기만 (true)
+        moveToDetail(clicked.name, true)  
+    }
+)
+
             }
         }
     }
 
-    // 💡 [수정] 이 함수가 updateUI 밖에, Archive_main 클래스 안에 정확히 위치해야 합니다.
+    
     private fun moveToDetail(emotionName: String, onlyOvercome: Boolean) {
         val detailFragment = Archive_detail().apply {
             arguments = Bundle().apply {
