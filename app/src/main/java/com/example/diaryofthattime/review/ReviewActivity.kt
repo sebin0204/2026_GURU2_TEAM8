@@ -101,7 +101,6 @@ class ReviewActivity : AppCompatActivity() {
     }
     private fun saveReviewData(db: AppDatabase, way: String, message: String) {
 
-        // 💡 [수정] 라디오 그룹에서 현재 선택된 '사실/추측' 상태 가져오기
         val stillFactValue = binding.rbStillFact.isChecked
 
         if (way.isBlank() || message.isBlank()) {
@@ -110,19 +109,21 @@ class ReviewActivity : AppCompatActivity() {
         }
 
         lifecycleScope.launch(Dispatchers.IO) {
-            // 데이터 업데이트
-            targetDiary?.apply {
-                isReviewed = true
-                this.stillFact = stillFactValue // 재판단 결과 저장
-                overcomeWay = way
-                messageToMe = message
+            // [수정] targetDiary 객체의 값을 직접 수정하고 업데이트합니다.
+            targetDiary?.let { diary ->
+                diary.isReviewed = true // 이 값이 true여야 상세페이지에서 도장이 보입니다!
+                diary.stillFact = stillFactValue
+                diary.overcomeWay = way
+                diary.messageToMe = message
+
+                db.diaryDao().update(diary)
+
+                // 데이터가 잘 저장됐는지 로그캣에 찍어봅니다.
+                android.util.Log.d("DiaryTest", "저장 완료! isReviewed: ${diary.isReviewed}")
             }
 
-            targetDiary?.let { db.diaryDao().update(it) }
-
             withContext(Dispatchers.Main) {
-                val msg = if (isEditMode) "회고 내용이 수정되었습니다!" else "오늘의 성장을 기록했습니다! ✨"
-                Toast.makeText(this@ReviewActivity, "극복 완료! 도장이 찍혔습니다.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@ReviewActivity, "극복 완료!", Toast.LENGTH_SHORT).show()
                 finish()
             }
         }
