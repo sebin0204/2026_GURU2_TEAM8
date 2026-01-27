@@ -10,9 +10,6 @@ interface DiaryDao {
     // 1. 기본 CRUD 기능
     @Insert
     suspend fun insert(diary: Diary) : Long
-    // 1. 기본 CRUD
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(diary: Diary)
 
     @Update
     suspend fun update(diary: Diary)
