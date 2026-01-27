@@ -50,7 +50,7 @@
             android:layout_marginVertical="12dp"
             android:background="#E6DCCB" />
 
-        <TextView
+        <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="최근 극복 방법"
