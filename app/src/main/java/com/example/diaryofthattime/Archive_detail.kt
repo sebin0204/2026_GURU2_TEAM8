@@ -19,6 +19,7 @@ import java.util.Calendar
 import com.example.diaryofthattime.data.AppDatabase
 import com.example.diaryofthattime.data.Diary
 import com.example.diaryofthattime.databinding.ActivityDiaryDetailBinding
+import com.example.diaryofthattime.review.ReviewActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -131,53 +132,44 @@ class Archive_detail : Fragment(R.layout.archive_emotion_detail) {
                                         .commit()
 
                                 }
-                                startActivity(intent)
-                            } else {
-                                val fragment = DiaryViewFragment().apply {
-                                    arguments = Bundle().apply { putInt("diaryId", diaryId) }
-                                }
-                                parentFragmentManager.beginTransaction()
-                                    .replace(R.id.main, fragment)
-                                    .addToBackStack(null)
-                                    .commit()
-                            }
                         }
                     }
                 }
             }
         }
     }
-
-    // --- 어댑터 클래스 ---
-    class ArchiveDetailAdapter(
-        private val items: List<Diary>,
-        private val emotion: String,
-        private val onItemClick: (Int) -> Unit
-    ) : RecyclerView.Adapter<ArchiveDetailAdapter.ViewHolder>() {
-
-        class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
-            val txtTitle: TextView = v.findViewById(R.id.itemTitle)
-            val txtDate: TextView = v.findViewById(R.id.itemDate)
-            val txtOvercome: TextView? = v.findViewById(R.id.itemOvercome)
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val layout = if (emotion == "행복") R.layout.item_archive_detail_happy else R.layout.item_archive_detail
-            val v = LayoutInflater.from(parent.context).inflate(layout, parent, false)
-            return ViewHolder(v)
-        }
-
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            val item = items[position]
-            holder.txtTitle.text = item.title
-            holder.txtDate.text = SimpleDateFormat("MM월 dd일", Locale.KOREA).format(Date(item.date))
-            holder.txtOvercome?.text = item.overcomeWay ?: "아직 기록된 극복 방법이 없어요."
-            holder.itemView.setOnClickListener { onItemClick(item.id) }
-        }
-
-        override fun getItemCount() = items.size
-    }
 }
+
+// --- 어댑터 클래스 ---
+class ArchiveDetailAdapter(
+    private val items: List<Diary>,
+    private val emotion: String,
+    private val onItemClick: (Int) -> Unit
+) : RecyclerView.Adapter<ArchiveDetailAdapter.ViewHolder>() {
+
+    class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
+        val txtTitle: TextView = v.findViewById(R.id.itemTitle)
+        val txtDate: TextView = v.findViewById(R.id.itemDate)
+        val txtOvercome: TextView? = v.findViewById(R.id.itemOvercome)
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val layout = if (emotion == "행복") R.layout.item_archive_detail_happy else R.layout.item_archive_detail
+        val v = LayoutInflater.from(parent.context).inflate(layout, parent, false)
+        return ViewHolder(v)
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val item = items[position]
+        holder.txtTitle.text = item.title
+        holder.txtDate.text = SimpleDateFormat("MM월 dd일", Locale.KOREA).format(Date(item.date))
+        holder.txtOvercome?.text = item.overcomeWay ?: "아직 기록된 극복 방법이 없어요."
+        holder.itemView.setOnClickListener { onItemClick(item.id) }
+    }
+
+    override fun getItemCount() = items.size
+}
+
 
 // --- 일기 확인(상세) 프래그먼트 (클래스 분리) ---
 class DiaryViewFragment : Fragment(R.layout.diary_view) {
