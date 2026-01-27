@@ -66,6 +66,14 @@ class DiaryDetailActivity : AppCompatActivity() {
                 bringToFront()        // 레이어 순서를 맨 앞으로
                 requestLayout()       // 화면 갱신 강제 요청
             }
+
+            // ★ 도장 보여주기 및 애니메이션 ★
+            binding.imgOvercomeStamp.visibility = View.VISIBLE //
+
+            // 도장이 '쾅' 하고 찍히는 느낌의 애니메이션 추가
+            val stampAnim = AnimationUtils.loadAnimation(this, android.R.anim.fade_in)
+            binding.imgOvercomeStamp.startAnimation(stampAnim)
+            binding.imgOvercomeStamp.visibility = View.VISIBLE
         } else {
             binding.layoutOvercomeResult.visibility = View.GONE
             binding.imgOvercomeStamp.visibility = View.GONE

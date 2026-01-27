@@ -54,13 +54,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun scheduleRandomHappyNotification() {
-        // 1~24시간 사이의 랜덤한 예약 시간 생성
-        //val randomDelay = (1..24).random().toLong()
-        val randomDelay = 1L //임시로 1분뒤로 설정
+//        // 1~24시간 사이의 랜덤한 예약 시간 생성
+//        val randomDelay = (1..24).random().toLong()
+//
+//        // 일회성 작업 예약
+//        val happyWorkRequest = OneTimeWorkRequestBuilder<HappyReminderWorker>()
+//            .setInitialDelay(randomDelay, TimeUnit.HOURS)
+//            .build()
+        // 임시로 1분뒤로 설정
+        val randomDelay = 1L
 
-        // 일회성 작업 예약
+        // 1분뒤여서 MINUTES로 수정 -> HOURS
         val happyWorkRequest = OneTimeWorkRequestBuilder<HappyReminderWorker>()
-            .setInitialDelay(randomDelay, TimeUnit.MINUTES) // 1분뒤여서 MINUTES로 수정 -> HOURS
+            .setInitialDelay(randomDelay, TimeUnit.MINUTES) 
             .build()
 
         // 시스템에 작업 등록
