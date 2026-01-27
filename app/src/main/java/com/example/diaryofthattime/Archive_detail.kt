@@ -89,7 +89,7 @@ class Archive_detail : Fragment(R.layout.archive_emotion_detail) {
             val db = AppDatabase.getDatabase(requireContext())
 
             db.diaryDao().getDiariesByMonthAndEmotion(yearStr, monthStr, emotion).collect { list ->
-                
+
                 // 💡 [핵심 필터링 로직 수정]
                 val finalList = if (onlyOvercome) {
                     // 버튼 클릭 시: 회고가 완료(isReviewed)되고 극복 방법이 있는 것만 필터링
@@ -113,21 +113,35 @@ class Archive_detail : Fragment(R.layout.archive_emotion_detail) {
                         recyclerView?.visibility = View.VISIBLE
                         txtNoData?.visibility = View.GONE
 
-                        recyclerView?.adapter = ArchiveDetailAdapter(finalList, emotion) { diaryId ->
-                            val fragment = DiaryViewFragment().apply {
-                                arguments = Bundle().apply { putInt("diaryId", diaryId) }
+                        recyclerView?.adapter =
+                            ArchiveDetailAdapter(finalList, emotion) { diaryId ->
+                                if (onlyOvercome) {
+                                    // 1️⃣ 극복 방법 리스트(Success Case)에서 클릭 시 -> 회고록(ReviewActivity)으로 이동
+                                    val intent =
+                                        Intent(requireContext(), ReviewActivity::class.java).apply {
+                                            putExtra("diaryId", diaryId.toLong())
+                                            putExtra("isEditMode", false) // 조회 모드로 진입
+                                        }
+                                    startActivity(intent)
+                                } else {
+                                    // 2️⃣ 일반 감정 리스트에서 클릭 시 -> 일기 상세 프래그먼트(DiaryViewFragment)로 이동
+                                    val fragment = DiaryViewFragment().apply {
+                                        arguments = Bundle().apply { putInt("diaryId", diaryId) }
+                                    }
+                                    parentFragmentManager.beginTransaction()
+                                        .replace(
+                                            R.id.main,
+                                            fragment
+                                        ) // ID 확인: fragmentContainer
+                                        .addToBackStack(null)
+                                        .commit()
+                                }
                             }
-                            parentFragmentManager.beginTransaction()
-                                .replace(R.id.main, fragment) // 컨테이너 ID를 XML에 맞게 수정
-                                .addToBackStack(null)
-                                .commit()
-                        }
                     }
                 }
             }
         }
     }
-
     // --- 어댑터 클래스 (동일) ---
     class ArchiveDetailAdapter(
         private val items: List<Diary>,
