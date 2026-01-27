@@ -66,7 +66,7 @@ class MainActivity : AppCompatActivity() {
 
         // 1분뒤여서 MINUTES로 수정 -> HOURS
         val happyWorkRequest = OneTimeWorkRequestBuilder<HappyReminderWorker>()
-            .setInitialDelay(randomDelay, TimeUnit.MINUTES) 
+            .setInitialDelay(randomDelay, TimeUnit.MINUTES)
             .build()
 
         // 시스템에 작업 등록

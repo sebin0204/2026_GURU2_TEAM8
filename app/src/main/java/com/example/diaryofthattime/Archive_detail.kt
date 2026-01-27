@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView
 import java.util.Calendar
 import com.example.diaryofthattime.data.AppDatabase
 import com.example.diaryofthattime.data.Diary
+import com.example.diaryofthattime.databinding.ActivityDiaryDetailBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -122,11 +123,9 @@ class Archive_detail : Fragment(R.layout.archive_emotion_detail) {
                             ArchiveDetailAdapter(finalList, emotion) { diaryId ->
                                 if (onlyOvercome) {
                                     // 1️⃣ 극복 방법 리스트(Success Case)에서 클릭 시 -> 회고록(ReviewActivity)으로 이동
-                                    val intent =
-                                        Intent(requireContext(), ReviewActivity::class.java).apply {
-                                            putExtra("diaryId", diaryId.toLong())
-                                            putExtra("isEditMode", false) // 조회 모드로 진입
-                                        }
+                                    val intent = Intent(requireContext(), DiaryDetailActivity::class.java).apply {
+                                        putExtra("DIARY_ID", diaryId) // DiaryDetailActivity가 사용하는 Key값
+                                    }
                                     startActivity(intent)
                                 } else {
                                     // 2️⃣ 일반 감정 리스트에서 클릭 시 -> 일기 상세 프래그먼트(DiaryViewFragment)로 이동
