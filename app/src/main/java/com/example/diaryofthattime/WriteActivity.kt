@@ -11,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.diaryofthattime.data.AppDatabase
 import com.example.diaryofthattime.data.Diary
 import com.example.diaryofthattime.databinding.ActivityWriteBinding
+import com.example.diaryofthattime.util.AlarmHelper // [추가] 알람 유틸리티
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -28,28 +29,27 @@ class WriteActivity : AppCompatActivity() {
         binding = ActivityWriteBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // [수정] 외부(Fragment 등)에서 보낸 데이터(ID와 수정모드 여부)를 받습니다.
+        // 1. 데이터 수신
         diaryId = intent.getIntExtra("diaryId", -1)
         isEditMode = intent.getBooleanExtra("isEditMode", false)
 
-        // 2. 오늘 날짜 표시 (ID: textDate)
+        // 2. 오늘 날짜 표시
         val sdf = SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREA)
         binding.textDate.text = sdf.format(System.currentTimeMillis())
 
-        // ★ 3. 최신 방식의 뒤로가기 콜백 설정 (onBackPressed 오류 해결)
+        // 3. 뒤로가기 콜백 설정
         val callback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 val title = binding.editTextText2.text.toString()
                 val content = binding.editTextText.text.toString()
 
-                // 제목이나 내용이 입력되어 있으면 확인 팝업 출력
                 if (title.isNotBlank() || content.isNotBlank()) {
                     AlertDialog.Builder(this@WriteActivity)
                         .setTitle("작성 취소")
                         .setMessage("작성 중인 일기가 저장되지 않습니다. 나가시겠습니까?")
                         .setPositiveButton("나가기") { _, _ ->
-                            isEnabled = false // 콜백 비활성화
-                            onBackPressedDispatcher.onBackPressed() // 실제 뒤로가기 수행
+                            isEnabled = false
+                            onBackPressedDispatcher.onBackPressed()
                         }
                         .setNegativeButton("계속 쓰기", null)
                         .show()
@@ -61,7 +61,7 @@ class WriteActivity : AppCompatActivity() {
         }
         onBackPressedDispatcher.addCallback(this, callback)
 
-        // 4. 상단 뒤로가기 버튼 클릭 리스너 (XML에 ID: btnBack이 있어야 함)
+        // 4. 상단 뒤로가기 버튼
         binding.btnBack.setOnClickListener {
             callback.handleOnBackPressed()
         }
@@ -81,7 +81,7 @@ class WriteActivity : AppCompatActivity() {
     private fun loadExistingData() {
         lifecycleScope.launch(Dispatchers.IO) {
             val db = AppDatabase.getDatabase(applicationContext)
-            val diary = db.diaryDao().getDiaryById(diaryId) //
+            val diary = db.diaryDao().getDiaryById(diaryId)
 
             withContext(Dispatchers.Main) {
                 diary?.let {
@@ -132,7 +132,8 @@ class WriteActivity : AppCompatActivity() {
 
         lifecycleScope.launch(Dispatchers.IO) {
             val db = AppDatabase.getDatabase(applicationContext)
-            val existingDiary = if (isEditMode) db.diaryDao().getDiaryById(diaryId) else null
+
+            // 새 데이터 객체 생성 (수정 모드일 경우 기존 ID 유지)
             val diaryData = Diary(
                 id = if (isEditMode) diaryId else 0,
                 title = diaryTitle,
@@ -145,12 +146,15 @@ class WriteActivity : AppCompatActivity() {
             if (isEditMode) {
                 db.diaryDao().update(diaryData)
             } else {
-                db.diaryDao().insert(diaryData)
+                // [중요] 신규 저장 시 생성된 row의 ID(Long)를 반환받습니다.
+                val newDiaryId = db.diaryDao().insert(diaryData)
+
+                // [알람 설정] 일주일 뒤 회고 알람 예약
+                AlarmHelper.scheduleReviewAlarm(applicationContext, newDiaryId, System.currentTimeMillis())
             }
 
             withContext(Dispatchers.Main) {
-
-                val msg = if (isEditMode) "일기가 수정되었습니다!" else "오늘의 일기가 저장되었습니다!"
+                val msg = if (isEditMode) "일기가 수정되었습니다!" else "오늘의 일기가 저장되었습니다!\n일주일 뒤에 다시 만나요."
                 Toast.makeText(this@WriteActivity, msg, Toast.LENGTH_SHORT).show()
 
                 val intent = Intent(this@WriteActivity, MainActivity::class.java)

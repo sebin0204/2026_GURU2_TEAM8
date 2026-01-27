@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 interface DiaryDao {
     // 1. 기본 CRUD 기능
     @Insert
-    suspend fun insert(diary: Diary)
+    suspend fun insert(diary: Diary) : Long
 
     @Query("SELECT * FROM diary_table ORDER BY date DESC")
     fun getAllDiaries(): Flow<List<Diary>>
