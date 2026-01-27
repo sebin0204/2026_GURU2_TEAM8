@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.RecyclerView
 import java.util.Calendar
 import com.example.diaryofthattime.data.AppDatabase
 import com.example.diaryofthattime.data.Diary
-import com.example.diaryofthattime.review.ReviewActivity   // ✅ 핵심 수정
+import com.example.diaryofthattime.review.ReviewActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -27,13 +27,12 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class Archive_detail : Fragment(R.layout.archive_emotion_detail) {
-    // 캘린더 객체에서 현재 월을 가져옵니다.
-    // Calendar.MONTH는 0부터 시작(1월이 0)하기 때문에 반드시 +1을 해줘야 합니다.
 
     private var currentYear = Calendar.getInstance().get(Calendar.YEAR)
     private var currentMonth = Calendar.getInstance().get(Calendar.MONTH) + 1
     private var recyclerView: RecyclerView? = null
     private var onlyOvercome: Boolean = false
+    private var dataJob: Job? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -51,9 +50,6 @@ class Archive_detail : Fragment(R.layout.archive_emotion_detail) {
         val txtDetailTitle = view.findViewById<TextView>(R.id.txtDetailTitle)
 
         // 타이틀 설정
-        txtDetailTitle.text = if (onlyOvercome) "$selectedEmotion (극복 기록)" else selectedEmotion
-        
-        // 💡 타이틀을 통해 현재 "전체"인지 "회고 완료"인지 구분해줍니다.
         txtDetailTitle.text = if (onlyOvercome) "$selectedEmotion (회고 완료)" else selectedEmotion
 
         val txtDate = view.findViewById<TextView>(R.id.txtCurrentDate)
@@ -65,31 +61,23 @@ class Archive_detail : Fragment(R.layout.archive_emotion_detail) {
         loadDataFromDB(selectedEmotion)
 
         btnPrev.setOnClickListener {
-            if (currentMonth > 1) currentMonth-- else {
-                currentMonth = 12; currentYear--
-            }
+            if (currentMonth > 1) currentMonth-- else { currentMonth = 12; currentYear-- }
             updateUI(txtDate)
             loadDataFromDB(selectedEmotion)
         }
 
         btnNext.setOnClickListener {
-            if (currentMonth < 12) currentMonth++ else {
-                currentMonth = 1; currentYear++
-            }
+            if (currentMonth < 12) currentMonth++ else { currentMonth = 1; currentYear++ }
             updateUI(txtDate)
             loadDataFromDB(selectedEmotion)
         }
 
-        btnBack.setOnClickListener {
-            parentFragmentManager.popBackStack()
-        }
+        btnBack.setOnClickListener { parentFragmentManager.popBackStack() }
     }
 
     private fun updateUI(txtDate: TextView) {
         txtDate.text = "${currentYear}년 ${currentMonth}월"
     }
-
-    private var dataJob: Job? = null
 
     private fun loadDataFromDB(emotion: String) {
         val yearStr = currentYear.toString()
@@ -99,43 +87,12 @@ class Archive_detail : Fragment(R.layout.archive_emotion_detail) {
         dataJob?.cancel()
         dataJob = lifecycleScope.launch {
             val db = AppDatabase.getDatabase(requireContext())
-            db.diaryDao()
-                .getDiariesByMonthAndEmotion(yearStr, monthStr, emotion)
-                .collect { list ->
-
-                    val finalList = if (onlyOvercome) {
-                        list.filter { !it.overcomeWay.isNullOrBlank() }
-                    } else list
-
-                    withContext(Dispatchers.Main) {
-                        if (finalList.isEmpty()) {
-                            recyclerView?.visibility = View.GONE
-                            txtNoData?.visibility = View.VISIBLE
-                        } else {
-                            recyclerView?.visibility = View.VISIBLE
-                            txtNoData?.visibility = View.GONE
-                            recyclerView?.adapter =
-                                ArchiveDetailAdapter(finalList) { diaryId ->
-                                    val fragment = DiaryViewFragment().apply {
-                                        arguments = Bundle().apply {
-                                            putInt("diaryId", diaryId)
-                                        }
-                                    }
-                                    parentFragmentManager.beginTransaction()
-                                        .replace(R.id.main, fragment)
-                                        .addToBackStack(null)
-                                        .commit()
-                                }
-                        }
-
             db.diaryDao().getDiariesByMonthAndEmotion(yearStr, monthStr, emotion).collect { list ->
 
-                // 💡 [핵심 필터링 로직 수정]
+                // 필터링 로직
                 val finalList = if (onlyOvercome) {
-                    // 버튼 클릭 시: 회고가 완료(isReviewed)되고 극복 방법이 있는 것만 필터링
-                    list.filter { it.isReviewed == true && !it.overcomeWay.isNullOrBlank() }
+                    list.filter { it.isReviewed && !it.overcomeWay.isNullOrBlank() }
                 } else {
-                    // 카드 클릭 시: 해당 월/감정의 모든 일기 노출
                     list
                 }
 
@@ -143,7 +100,6 @@ class Archive_detail : Fragment(R.layout.archive_emotion_detail) {
                     if (finalList.isEmpty()) {
                         recyclerView?.visibility = View.GONE
                         txtNoData?.visibility = View.VISIBLE
-                        // 안내 문구 세분화
                         txtNoData?.text = if (onlyOvercome) {
                             "${currentMonth}월에 회고 완료된 '${emotion}' 기록이 없습니다."
                         } else {
@@ -152,39 +108,33 @@ class Archive_detail : Fragment(R.layout.archive_emotion_detail) {
                     } else {
                         recyclerView?.visibility = View.VISIBLE
                         txtNoData?.visibility = View.GONE
-
-                        recyclerView?.adapter =
-                            ArchiveDetailAdapter(finalList, emotion) { diaryId ->
-                                if (onlyOvercome) {
-                                    // 1️⃣ 극복 방법 리스트(Success Case)에서 클릭 시 -> 회고록(ReviewActivity)으로 이동
-                                    val intent =
-                                        Intent(requireContext(), ReviewActivity::class.java).apply {
-                                            putExtra("diaryId", diaryId.toLong())
-                                            putExtra("isEditMode", false) // 조회 모드로 진입
-                                        }
-                                    startActivity(intent)
-                                } else {
-                                    // 2️⃣ 일반 감정 리스트에서 클릭 시 -> 일기 상세 프래그먼트(DiaryViewFragment)로 이동
-                                    val fragment = DiaryViewFragment().apply {
-                                        arguments = Bundle().apply { putInt("diaryId", diaryId) }
-                                    }
-                                    parentFragmentManager.beginTransaction()
-                                        .replace(
-                                            R.id.main,
-                                            fragment
-                                        ) // ID 확인: fragmentContainer
-                                        .addToBackStack(null)
-                                        .commit()
+                        recyclerView?.adapter = ArchiveDetailAdapter(finalList, emotion) { diaryId ->
+                            if (onlyOvercome) {
+                                val intent = Intent(requireContext(), ReviewActivity::class.java).apply {
+                                    putExtra("diaryId", diaryId)
+                                    putExtra("isEditMode", false)
                                 }
+                                startActivity(intent)
+                            } else {
+                                val fragment = DiaryViewFragment().apply {
+                                    arguments = Bundle().apply { putInt("diaryId", diaryId) }
+                                }
+                                parentFragmentManager.beginTransaction()
+                                    .replace(R.id.main, fragment)
+                                    .addToBackStack(null)
+                                    .commit()
                             }
+                        }
                     }
                 }
+            }
         }
     }
 
-    // --- 어댑터 클래스 (동일) ---
+    // --- 어댑터 클래스 ---
     class ArchiveDetailAdapter(
         private val items: List<Diary>,
+        private val emotion: String,
         private val onItemClick: (Int) -> Unit
     ) : RecyclerView.Adapter<ArchiveDetailAdapter.ViewHolder>() {
 
@@ -195,40 +145,32 @@ class Archive_detail : Fragment(R.layout.archive_emotion_detail) {
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val v = LayoutInflater.from(parent.context)
-                .inflate(R.layout.item_archive_detail, parent, false)
+            val layout = if (emotion == "행복") R.layout.item_archive_detail_happy else R.layout.item_archive_detail
+            val v = LayoutInflater.from(parent.context).inflate(layout, parent, false)
             return ViewHolder(v)
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val item = items[position]
             holder.txtTitle.text = item.title
-            holder.txtDate.text =
-                SimpleDateFormat("MM월 dd일", Locale.KOREA).format(Date(item.date))
-
-            holder.txtOvercome?.text =
-                item.overcomeWay ?: "아직 기록된 극복 방법이 없어요."
-
-            holder.itemView.setOnClickListener {
-                onItemClick(item.id)
-            }
+            holder.txtDate.text = SimpleDateFormat("MM월 dd일", Locale.KOREA).format(Date(item.date))
+            holder.txtOvercome?.text = item.overcomeWay ?: "아직 기록된 극복 방법이 없어요."
+            holder.itemView.setOnClickListener { onItemClick(item.id) }
         }
 
         override fun getItemCount() = items.size
     }
 }
 
-// ---------------- 상세 보기 ----------------
-
-// --- 일기 확인(상세) 프래그먼트 ---
+// --- 일기 확인(상세) 프래그먼트 (클래스 분리) ---
 class DiaryViewFragment : Fragment(R.layout.diary_view) {
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         val diaryId = arguments?.getInt("diaryId") ?: return
-
         val btnEdit = view.findViewById<ImageButton>(R.id.btnEdit)
+        val btnBack = view.findViewById<ImageButton>(R.id.btnBack)
+
+        btnBack?.setOnClickListener { parentFragmentManager.popBackStack() }
 
         lifecycleScope.launch {
             val db = AppDatabase.getDatabase(requireContext())
@@ -237,7 +179,7 @@ class DiaryViewFragment : Fragment(R.layout.diary_view) {
             btnEdit.setOnClickListener {
                 if (diary.isReviewed) {
                     val intent = Intent(requireContext(), ReviewActivity::class.java).apply {
-                        putExtra("DIARY_ID", diaryId)
+                        putExtra("diaryId", diaryId)
                         putExtra("isEditMode", true)
                     }
                     startActivity(intent)
