@@ -1,8 +1,13 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
     <style name="Base.Theme.DiaryOfThatTime" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="android:fontFamily">@font/kyobohandwriting2024psw</item>
+        <item name="fontFamily">@font/kyobohandwriting2024psw</item>
+
+    </style>
+
+    <style name="CustomCalendarTheme" parent="Theme.AppCompat.Light">
+        <item name="colorControlActivated">#9B7F61</item>
+        <item name="android:textColorPrimary">#333333</item>
     </style>
 
     <style name="Theme.DiaryOfThatTime" parent="Base.Theme.DiaryOfThatTime" />

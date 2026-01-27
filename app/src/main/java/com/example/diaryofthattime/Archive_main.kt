@@ -4,84 +4,116 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.diaryofthattime.data.AppDatabase
+import kotlinx.coroutines.launch
+import java.util.Calendar
 
-// 통계 데이터를 담기 위한 간단한 클래스
-//DB용 데이터 (Dao에서 사용)
-data class EmotionCount(
-    val emotion: String,
-    val count: Int
-)
+// 통계 데이터를 담기 위한 클래스들
+data class EmotionCount(val emotion: String, val count: Int)
+data class EmotionReport(val name: String, val count: Int, val bestWay: String)
 
-//UI용 데이터 (화면에 보여줄 정보들)
-data class EmotionReport(
-    val name: String,
-    val count: Int,
-    val bestWay: String
-)
+class Archive_main : Fragment(R.layout.archive_emotion) {
 
-class Report_main : Fragment(R.layout.archive_emotion){
+    private var currentYear = Calendar.getInstance().get(Calendar.YEAR)
+    private var currentMonth = Calendar.getInstance().get(Calendar.MONTH) + 1
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerEmotionCards)
         val txtSummary = view.findViewById<TextView>(R.id.txtSummaryMost)
+        val txtDate = view.findViewById<TextView>(R.id.txtCurrentDate)
 
-        // 5개 감정 더미 가짜 데이터
-        val reportList = listOf(
-            EmotionReport("행복", 12, "가족들과 맛있는 저녁을 먹으며 대화하기"),
-            EmotionReport("슬픔", 5, "슬픈 영화를 보며 한바탕 울고 푹 자고 일어나기"),
-            EmotionReport("분노", 3, "운동장에서 숨이 찰 때까지 달리기"),
-            EmotionReport("불안", 8, "명상 앱을 켜고 5분간 호흡에 집중하기"),
-            EmotionReport("무기력", 2, "작은 화분에 물 주기나 방 청소하기")
-        )
+        val btnPrev = view.findViewById<ImageButton>(R.id.btnPrevMonth)
+        val btnNext = view.findViewById<ImageButton>(R.id.btnNextMonth)
+        val btnBack = view.findViewById<ImageButton>(R.id.btnBack)
 
+        btnBack.setOnClickListener { parentFragmentManager.popBackStack() }
 
-        // "행복" 감정만 추출해서 횟수 표시하기
-        // 만약 리스트에 "행복"이 없을 수도 있으니 find를 사용
-        val happyEmotion = reportList.find { it.name == "행복" }
+        updateUI(txtDate, txtSummary, recyclerView)
 
-        if (happyEmotion != null) {
-            // "Happy : 12회" 형식으로 출력
-            txtSummary.text = "Happy : ${happyEmotion.count}회"
-        } else {
-            txtSummary.text = "Happy : - 회"
-        }
-
-        // 리사이클러뷰 설정 (정렬된 리스트 사용)
-        // count(횟수)를 기준으로 내림차순(descending) 정렬
-        val sortedList = reportList.sortedByDescending { it.count }
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView.adapter = EmotionCardAdapter(sortedList) { clickedEmotion ->
-
-            // 상세 화면 프래그먼트 생성
-            val detailFragment = Archive_detail()
-
-            // 클릭한 감정 이름을 상세 화면으로 전달 (Bundle 사용)
-            val bundle = Bundle().apply {
-                putString("emotionName", clickedEmotion.name)
+        btnPrev.setOnClickListener {
+            if (currentMonth > 1) currentMonth-- else {
+                currentMonth = 12; currentYear--
             }
-            detailFragment.arguments = bundle
-
-            // 화면 전환 (MainActivity에서 썼던 replace 로직 활용)
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.main, detailFragment)
-                .addToBackStack(null) // 뒤로가기 버튼 누르면 다시 보고서로 돌아옴
-                .commit()
-
+            updateUI(txtDate, txtSummary, recyclerView)
         }
+
+        btnNext.setOnClickListener {
+            if (currentMonth < 12) currentMonth++ else {
+                currentMonth = 1; currentYear++
+            }
+            updateUI(txtDate, txtSummary, recyclerView)
+        }
+    }
+
+    private fun updateUI(txtDate: TextView, txtSummary: TextView, rv: RecyclerView) {
+        val yearStr = currentYear.toString()
+        val monthStr = String.format("%02d", currentMonth)
+        txtDate.text = "${yearStr}년 ${monthStr}월"
+
+        lifecycleScope.launch {
+            val db = AppDatabase.getDatabase(requireContext())
+            db.diaryDao().getDiariesByMonth(yearStr, monthStr).collect { diaries ->
+
+                val fixedEmotions = listOf("행복", "무기력", "슬픔", "불안", "화남")
+
+                val reportList = fixedEmotions.map { emotionName ->
+                    val filteredDiaries = diaries.filter { it.emotion == emotionName }
+                    val count = filteredDiaries.size
+
+                    val lastOvercome = filteredDiaries.firstOrNull { !it.overcomeWay.isNullOrBlank() }?.overcomeWay
+                        ?: "아직 기록된 극복 방법이 없어요."
+
+                    EmotionReport(
+                        name = emotionName,
+                        count = count,
+                        bestWay = lastOvercome
+                    )
+                }
+
+                val happyCount = reportList.find { it.name == "행복" }?.count ?: 0
+                txtSummary.text = "행복 : ${if (happyCount > 0) "${happyCount}회" else "- 회"}"
+
+                rv.layoutManager = LinearLayoutManager(requireContext())
+                rv.adapter = EmotionCardAdapter(
+                    reportList,
+                    onCardClick = { clicked -> moveToDetail(clicked.name, false) },
+                    onMethodClick = { clicked -> moveToDetail(clicked.name, true) }
+                )
+            }
+        }
+    }
+
+    // 💡 [수정] 이 함수가 updateUI 밖에, Archive_main 클래스 안에 정확히 위치해야 합니다.
+    private fun moveToDetail(emotionName: String, onlyOvercome: Boolean) {
+        val detailFragment = Archive_detail().apply {
+            arguments = Bundle().apply {
+                putString("emotionName", emotionName)
+                putInt("selectedYear", currentYear)
+                putInt("selectedMonth", currentMonth)
+                putBoolean("onlyOvercome", onlyOvercome)
+            }
+        }
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.main, detailFragment)
+            .addToBackStack(null)
+            .commit()
     }
 }
 
-// 카드뷰 전용 어댑터
+// 💡 [수정] 어댑터 클래스는 Archive_main 클래스 외부(파일 하단)에 있는 것이 깔끔합니다.
 class EmotionCardAdapter(
     private val items: List<EmotionReport>,
-    private val onClick: (EmotionReport) -> Unit // 클릭 시 실행할 함수를 인자로 받음
+    private val onCardClick: (EmotionReport) -> Unit,
+    private val onMethodClick: (EmotionReport) -> Unit
 ) : RecyclerView.Adapter<EmotionCardAdapter.ViewHolder>() {
 
     class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
@@ -99,15 +131,15 @@ class EmotionCardAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val data = items[position]
         holder.title.text = data.name
-        holder.count.text = "이번 달 ${data.count}회"
+        holder.count.text = if (data.count > 0) "이번 달 ${data.count}회" else "이번 달 -회"
         holder.method.text = data.bestWay
 
-        // 카드 전체에 클릭 리스너 설정
-        holder.itemView.setOnClickListener {
-            onClick(data) // 클릭된 데이터를 밖으로 던져줌
-        }
+        // 카드 전체 클릭
+        holder.itemView.setOnClickListener { onCardClick(data) }
+
+        // 극복 방법 텍스트 클릭
+        holder.method.setOnClickListener { onMethodClick(data) }
     }
 
     override fun getItemCount() = items.size
 }
-

@@ -4,6 +4,8 @@
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
         android:name=".DiaryApplication"
         android:allowBackup="true"
@@ -26,6 +28,8 @@
         <activity
             android:name=".WriteActivity"
             android:exported="true" />
+
+        <activity android:name=".DiaryDetailActivity" />
 
         <activity
             android:name=".MainActivity"

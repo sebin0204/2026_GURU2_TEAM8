@@ -11,7 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:background="#FDFBF7">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -25,7 +26,7 @@
                 android:layout_weight="1"
                 android:text="일기 제목"
                 android:textStyle="bold"
-                android:textColor="#44622E"/>
+                android:textColor="#3E3429"/>
 
             <TextView
                 android:id="@+id/itemDate"
