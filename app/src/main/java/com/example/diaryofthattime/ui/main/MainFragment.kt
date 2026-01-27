@@ -11,7 +11,6 @@ import com.example.diaryofthattime.Archive_main
 import com.example.diaryofthattime.DiaryDetailActivity // 상세 페이지 import 추가
 import com.example.diaryofthattime.DiaryViewFragment
 import com.example.diaryofthattime.R
-import com.example.diaryofthattime.ReviewActivity
 import com.example.diaryofthattime.WriteActivity
 import com.example.diaryofthattime.data.AppDatabase
 import com.example.diaryofthattime.data.Diary

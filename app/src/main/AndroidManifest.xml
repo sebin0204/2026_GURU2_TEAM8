@@ -21,6 +21,8 @@
 
         <receiver android:name=".receiver.AlarmReceiver" android:exported="false" />
 
+        <activity android:name=".ReviewActivity" />
+
         <activity
             android:name=".review.ReviewActivity"
             android:exported="true" />
