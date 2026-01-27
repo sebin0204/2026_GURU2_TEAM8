@@ -11,8 +11,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.diaryofthattime.R
-import com.example.diaryofthattime.ReviewActivity
 import com.example.diaryofthattime.data.AppDatabase
+import com.example.diaryofthattime.review.ReviewActivity   // ⭐ 핵심
 import com.example.diaryofthattime.ui.archive.adapter.DiaryAdapter
 import kotlinx.coroutines.launch
 
