@@ -30,14 +30,15 @@ class Archive_detail : Fragment(R.layout.archive_emotion_detail) {
     private var currentYear = Calendar.getInstance().get(Calendar.YEAR)
     private var currentMonth = Calendar.getInstance().get(Calendar.MONTH) + 1
     private var recyclerView: RecyclerView? = null
+    private var onlyOvercome: Boolean = false 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // [추가] 메인 화면에서 넘겨준 연도와 월을 받아옵니다.
+        
         arguments?.let {
-            // 값이 없을 경우를 대비해 현재 날짜를 기본값으로 유지
             currentYear = it.getInt("selectedYear", currentYear)
             currentMonth = it.getInt("selectedMonth", currentMonth)
+            onlyOvercome = it.getBoolean("onlyOvercome", false) 
         }
 
         recyclerView = view.findViewById(R.id.recyclerDetailList)
@@ -45,7 +46,9 @@ class Archive_detail : Fragment(R.layout.archive_emotion_detail) {
 
         val selectedEmotion = arguments?.getString("emotionName") ?: "감정"
         val txtDetailTitle = view.findViewById<TextView>(R.id.txtDetailTitle)
-        txtDetailTitle.text = selectedEmotion
+        
+        // 💡 타이틀을 통해 현재 "전체"인지 "회고 완료"인지 구분해줍니다.
+        txtDetailTitle.text = if (onlyOvercome) "$selectedEmotion (회고 완료)" else selectedEmotion
 
         val txtDate = view.findViewById<TextView>(R.id.txtCurrentDate)
         val btnPrev = view.findViewById<ImageButton>(R.id.btnPrevMonth)
@@ -74,38 +77,48 @@ class Archive_detail : Fragment(R.layout.archive_emotion_detail) {
         txtDate.text = "${currentYear}년 ${currentMonth}월"
     }
 
-    private var dataJob: kotlinx.coroutines.Job? = null // 이전 데이터 구독을 관리하기 위한 변수
+    private var dataJob: kotlinx.coroutines.Job? = null
 
     private fun loadDataFromDB(emotion: String) {
         val yearStr = currentYear.toString()
         val monthStr = String.format("%02d", currentMonth)
         val txtNoData = view?.findViewById<TextView>(R.id.txtNoData)
 
-        // 새로운 달의 데이터를 부르기 전, 이전 데이터 로딩 작업이 있다면 취소합니다.
         dataJob?.cancel()
-
         dataJob = lifecycleScope.launch {
             val db = AppDatabase.getDatabase(requireContext())
 
-            // 해당 연도, 해당 월, 해당 감정으로 쿼리 수행
             db.diaryDao().getDiariesByMonthAndEmotion(yearStr, monthStr, emotion).collect { list ->
+                
+                // 💡 [핵심 필터링 로직 수정]
+                val finalList = if (onlyOvercome) {
+                    // 버튼 클릭 시: 회고가 완료(isReviewed)되고 극복 방법이 있는 것만 필터링
+                    list.filter { it.isReviewed == true && !it.overcomeWay.isNullOrBlank() }
+                } else {
+                    // 카드 클릭 시: 해당 월/감정의 모든 일기 노출
+                    list
+                }
+
                 withContext(Dispatchers.Main) {
-                    if (list.isEmpty()) {
+                    if (finalList.isEmpty()) {
                         recyclerView?.visibility = View.GONE
                         txtNoData?.visibility = View.VISIBLE
-                        // 데이터가 없을 때 표시될 텍스트 설정
-                        txtNoData?.text = "${currentMonth}월에 기록된 '${emotion}' 일기가 없습니다."
+                        // 안내 문구 세분화
+                        txtNoData?.text = if (onlyOvercome) {
+                            "${currentMonth}월에 회고 완료된 '${emotion}' 기록이 없습니다."
+                        } else {
+                            "${currentMonth}월에 작성된 '${emotion}' 일기가 없습니다."
+                        }
                     } else {
                         recyclerView?.visibility = View.VISIBLE
                         txtNoData?.visibility = View.GONE
 
-                        // 어댑터 갱신 (리스트가 바뀔 때마다 새 어댑터 설정 혹은 데이터 갱신)
-                        recyclerView?.adapter = ArchiveDetailAdapter(list, emotion) { diaryId ->
+                        recyclerView?.adapter = ArchiveDetailAdapter(finalList, emotion) { diaryId ->
                             val fragment = DiaryViewFragment().apply {
                                 arguments = Bundle().apply { putInt("diaryId", diaryId) }
                             }
                             parentFragmentManager.beginTransaction()
-                                .replace(R.id.main, fragment)
+                                .replace(R.id.main, fragment) // 컨테이너 ID를 XML에 맞게 수정
                                 .addToBackStack(null)
                                 .commit()
                         }
@@ -115,6 +128,7 @@ class Archive_detail : Fragment(R.layout.archive_emotion_detail) {
         }
     }
 
+    // --- 어댑터 클래스 (동일) ---
     class ArchiveDetailAdapter(
         private val items: List<Diary>,
         private val emotion: String,
@@ -177,15 +191,6 @@ class DiaryViewFragment : Fragment(R.layout.diary_view) {
 
         btnBack.setOnClickListener { parentFragmentManager.popBackStack() }
 
-        btnEdit.setOnClickListener {
-            val intent = Intent(requireContext(), WriteActivity::class.java).apply {
-                putExtra("diaryId", diaryId)
-                putExtra("isEditMode", true)
-            }
-            startActivity(intent)
-            Toast.makeText(requireContext(), "수정 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
-        }
-
         btnDelete.setOnClickListener {
             AlertDialog.Builder(requireContext())
                 .setTitle("일기 삭제")
@@ -220,7 +225,9 @@ class DiaryViewFragment : Fragment(R.layout.diary_view) {
                 val diary = db.diaryDao().getDiaryById(diaryId)
 
                 if (diary != null) {
-                    // [핵심 1] 회고 여부에 따른 수정 버튼 이동 경로 분기
+                    // [핵심 1] 제목(txtTitle) 데이터 세팅 추가됨!
+                    txtTitle.text = diary.title
+                    // [핵심 2] 회고 여부에 따른 수정 버튼 이동 경로 분기
                     btnEdit.setOnClickListener {
                         if (diary.isReviewed) {
                             // 회고 완료 후 -> 회고 수정 페이지(ReviewActivity)
