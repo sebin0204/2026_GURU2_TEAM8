@@ -15,17 +15,19 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import java.util.Calendar
 import com.example.diaryofthattime.data.AppDatabase
 import com.example.diaryofthattime.data.Diary
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
-import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
 class Archive_detail : Fragment(R.layout.archive_emotion_detail) {
+    // 캘린더 객체에서 현재 월을 가져옵니다.
+    // Calendar.MONTH는 0부터 시작(1월이 0)하기 때문에 반드시 +1을 해줘야 합니다.
 
     private var currentYear = Calendar.getInstance().get(Calendar.YEAR)
     private var currentMonth = Calendar.getInstance().get(Calendar.MONTH) + 1
@@ -34,11 +36,11 @@ class Archive_detail : Fragment(R.layout.archive_emotion_detail) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        
+
         arguments?.let {
             currentYear = it.getInt("selectedYear", currentYear)
             currentMonth = it.getInt("selectedMonth", currentMonth)
-            onlyOvercome = it.getBoolean("onlyOvercome", false) 
+            onlyOvercome = it.getBoolean("onlyOvercome", false)
         }
 
         recyclerView = view.findViewById(R.id.recyclerDetailList)
@@ -46,6 +48,9 @@ class Archive_detail : Fragment(R.layout.archive_emotion_detail) {
 
         val selectedEmotion = arguments?.getString("emotionName") ?: "감정"
         val txtDetailTitle = view.findViewById<TextView>(R.id.txtDetailTitle)
+
+        // 타이틀 설정
+        txtDetailTitle.text = if (onlyOvercome) "$selectedEmotion (극복 기록)" else selectedEmotion
         
         // 💡 타이틀을 통해 현재 "전체"인지 "회고 완료"인지 구분해줍니다.
         txtDetailTitle.text = if (onlyOvercome) "$selectedEmotion (회고 완료)" else selectedEmotion
