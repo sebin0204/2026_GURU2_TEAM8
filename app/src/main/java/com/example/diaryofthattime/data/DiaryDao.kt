@@ -34,7 +34,6 @@ interface DiaryDao {
     suspend fun getDiaryByDateRange(start: Long, end: Long): List<Diary>
 
     // 3. 월별 통계 및 목록
-    // 💡 여기서 EmotionCount가 빨간 줄이 뜬다면, EmotionCount.kt 파일의 패키지가 data인지 확인하세요.
     @Query("""
         SELECT emotion, COUNT(*) as count FROM diary_table 
         WHERE strftime('%Y', date / 1000, 'unixepoch') = :year 
