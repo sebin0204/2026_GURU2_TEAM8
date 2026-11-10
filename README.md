@@ -7,7 +7,6 @@
 |---|---|
 | 기간 | 2026.01.14 ~ 2026.01.27 |
 | 플랫폼 | Android (Kotlin) |
-| 팀 구성 | 5인 |
 | 내 기여 | 전체 125커밋 중 **53커밋** (팀 내 최다) |
 
 <br>
@@ -83,9 +82,9 @@ app/src/main/java/com/example/diaryofthattime
 
 ## 👥 Team
 
-| 이름 | GitHub |
-|---|---|
-| 박세빈 | [@sebin0204](https://github.com/sebin0204) |
-| 최윤정 | [@dw261](https://github.com/dw261) |
-| 이혜원 | [@hyeweooon](https://github.com/hyeweooon) |
-| - | [@ojin4477](https://github.com/ojin4477) |
+| GitHub |
+|---|
+| [@sebin0204](https://github.com/sebin0204) (박세빈) |
+| [@dw261](https://github.com/dw261) |
+| [@hyeweooon](https://github.com/hyeweooon) |
+| [@ojin4477](https://github.com/ojin4477) |
